@@ -1,0 +1,49 @@
+* FIX: a HEAD request on a XML file has a content-type text/xml and this would trigger
+  the reading of the body of the response. Now, we never read the body on HEAD requests.
+
+* NEW: On the Website, there is now a FAQ page. Very limited now, the main
+  purpose of this page was to discuss the naming convention used by s3DAV to
+  define the keys. This explains also why, for now, you can't see the content
+  uploaded by a different tool than s3DAV
+
+* NEW: You can browse the content from your Internet Browser by
+  accessing the URL http://127.0.0.1:8070
+
+* NEW: when copying file into your s3 account, the content
+  is no more fully stored into memory: it's copied into a file
+  which is then mapped into memory.
+
+* FIX: leading and trailing spaces are removed from
+  the ids in the AWS account form.
+
+* FIX: when we get content from the S3 repository (object GET)
+  the content is fully read in memory before being sent back to the
+  webDAV request.
+  Now, the InputStream is directly sent back to the initiating webDAV
+  request. The connection with S3 is closed when all the data have been
+  read from the webDAV request.
+
+* NEW: the version number of s3DAV is displayed on startup
+
+* NEW: in the S3 requests, the USer-Agent is now set to s3DAV/<version number>
+
+* FIX: the server is not working properly when compiled with JDK 1.5 - we get
+  a 403 error back from the server.
+  The reason is that, when sending a HEAD request, the HttpURLConnection is automatically adding the content type
+  application/x-www-form-urlencoded and this breaks the Authorization mechanism.
+
+HEAD /s3dav//build.xml HTTP/1.1\r\n
+Authorization: AWS XXX:YYY
+Date: Mon, 03 Apr 2006 17:14:32 GMT\r\n
+Content-Length: 0\r\n
+User-Agent: Java/1.5.0_06\r\n
+Host: s3.amazonaws.com\r\n
+Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2\r\n
+Connection: keep-alive\r\n
+Content-type: application/x-www-form-urlencoded\r\n
+\r\n
+
+  Now, when a content-type is not set by the application, we always set the content-type to "application/x-www-form-urlencoded",
+  even though there is no content associated to the message.
+
+* RELEASE [2006-03-31] : version 0.2 released
