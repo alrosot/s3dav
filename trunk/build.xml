@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<project name="s3DAV" default="all" basedir=".">
+    <target name="all" depends="jar"/>
+    <property name="version" value="0.3"/>
+    
+    <target name="clean">
+        <delete dir="build"/>
+        <delete file="s3DAV-${version}.jar"/>
+        <delete file="s3DAV-${version}.zip"/>
+    </target>
+    
+    <target name="build">
+        <mkdir dir="build"/>
+        <javac destdir="build"
+               srcdir="src"
+               debug="on"
+               optimize="off"
+               deprecation="on"
+               includeAntRuntime="false"/> 
+    </target>
+    
+    <target name="jar" depends="build">
+        <jar jarfile="s3DAV-${version}.jar"
+             basedir="build">
+            <manifest>
+                <attribute name="Main-Class" value="org.carion.s3dav.Main"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="zip" depends="jar">
+        <zip destfile="s3DAV-${version}.zip">
+            <zipfileset dir="." includes="s3DAV-${version}.jar,src/**/*.*,build.xml,LICENSE.txt,README.txt, CHANGELOG.txt" prefix="s3DAV-${version}"/>
+        </zip>
+    </target>
+    
+</project>
