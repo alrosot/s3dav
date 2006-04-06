@@ -6,8 +6,7 @@
     
     <target name="clean">
         <delete dir="build"/>
-        <delete file="s3DAV-${version}.jar"/>
-        <delete file="s3DAV-${version}.zip"/>
+        <delete dir="dist"/>
     </target>
     
     <target name="build">
@@ -21,7 +20,8 @@
     </target>
     
     <target name="jar" depends="build">
-        <jar jarfile="s3DAV-${version}.jar"
+        <mkdir dir="dist"/>
+        <jar jarfile="dist/s3DAV-${version}.jar"
              basedir="build">
             <manifest>
                 <attribute name="Main-Class" value="org.carion.s3dav.Main"/>
@@ -30,8 +30,9 @@
     </target>
     
     <target name="zip" depends="jar">
-        <zip destfile="s3DAV-${version}.zip">
-            <zipfileset dir="." includes="s3DAV-${version}.jar,src/**/*.*,build.xml,LICENSE.txt,README.txt, CHANGELOG.txt" prefix="s3DAV-${version}"/>
+        <zip destfile="dist/s3DAV-${version}.zip">
+            <zipfileset dir="." includes="src/**/*.*,build.xml,LICENSE.txt,README.txt, CHANGELOG.txt" prefix="s3DAV-${version}"/>
+            <zipfileset dir="dist" includes="s3DAV-${version}.jar" prefix="s3DAV-${version}"/>
         </zip>
     </target>
     
