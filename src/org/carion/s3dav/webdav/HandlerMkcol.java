@@ -73,8 +73,7 @@ public class HandlerMkcol extends HandlerBase {
         String parent = _repository.getParentUri(uri);
         if (parent != null) {
             if (!_repository.isFolder(parent)) {
-                response
-                        .setResponseStatus(WebdavResponse.SC_CONFLICT);
+                response.setResponseStatus(WebdavResponse.SC_CONFLICT);
                 return;
             }
         }

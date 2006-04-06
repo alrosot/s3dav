@@ -31,6 +31,10 @@ public class ResourceName {
     private final boolean _isRoot;
 
     public ResourceName(String uri) {
+        this(uri, true);
+    }
+
+    public ResourceName(String uri, boolean encode) {
         uri = uri.trim();
 
         if (uri.equals("/")) {
@@ -48,7 +52,11 @@ public class ResourceName {
             String part = null;
             String first = null;
             while (st.hasMoreElements()) {
-                part = encode(st.nextToken().trim());
+                if (encode) {
+                    part = encode(st.nextToken().trim());
+                } else {
+                    part = st.nextToken().trim();
+                }
                 sb.append("/");
                 sb.append(part);
                 if (previous != null) {
@@ -95,7 +103,6 @@ public class ResourceName {
             ext = getName().substring(dot + 1);
         }
         return ext;
-
     }
 
     private String encode(String name) {

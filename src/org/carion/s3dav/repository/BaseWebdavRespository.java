@@ -19,7 +19,10 @@ import java.io.IOException;
 
 public abstract class BaseWebdavRespository implements WebdavRepository {
     public String getParentUri(String uri) throws IOException {
-        ResourceName name = new ResourceName(uri);
+        // when trying to get the parent URI, we consider that the
+        // following URI is already encoded, so no need to
+        // reencode the parent URI
+        ResourceName name = new ResourceName(uri, false);
         return name.getParentUri();
     }
 

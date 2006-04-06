@@ -84,6 +84,7 @@ public class BucketGET extends BaseS3Operation {
     void addContent(String key, Date lastModified, int size) {
         _lastKey = key;
         _objects.add(new Object(key, lastModified, size));
+        System.out.println(">>get>> key=(" + key + ")");
     }
 
     private class Handler extends BaseXmlParser {
