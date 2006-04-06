@@ -34,7 +34,6 @@ public class MemoryMappedFile {
 
     private MemoryMappedFile(File file) {
         _file = file;
-        System.out.println("@@@ memory mapped file is:"+file);
     }
 
     public void copy(InputStream in, int length) throws IOException{

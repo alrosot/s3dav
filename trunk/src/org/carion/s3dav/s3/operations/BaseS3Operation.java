@@ -96,7 +96,7 @@ abstract public class BaseS3Operation implements S3Processing {
 
     protected boolean process(S3Request s3Request) {
         _log.log("Request:" + s3Request.getMethod() + " " + s3Request.getPath()
-                + s3Request.getQueryString());
+                + " " + s3Request.getQueryString());
         for (Iterator iter = _metaToAddInRequest.keySet().iterator(); iter
                 .hasNext();) {
             String key = (String) iter.next();

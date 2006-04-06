@@ -188,7 +188,6 @@ public class S3Request {
             conn.connect();
 
             if (_content != null) {
-                System.out.println("@@@ copy content...");
                 OutputStream dataout = conn.getOutputStream();
                 InputStream in = mkInputStream(_content);
                 int len = 0;
@@ -197,7 +196,6 @@ public class S3Request {
                     dataout.write(data, 0, len);
                 }
                 dataout.close();
-                System.out.println("@@@ copy content DONE");
             }
 
             int responseCode = conn.getResponseCode();

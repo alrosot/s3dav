@@ -1,3 +1,7 @@
+* FIX: a double encoding when getting the parent URI made impossible to
+  create a directory containing a space, if one of the ancestor already had
+  a space in its name.
+
 * FIX: a HEAD request on a XML file has a content-type text/xml and this would trigger
   the reading of the body of the response. Now, we never read the body on HEAD requests.
 
