@@ -1,3 +1,5 @@
+* NEW: the logs have been changed in order to help tracking of problems
+
 * FIX: a double encoding when getting the parent URI made impossible to
   create a directory containing a space, if one of the ancestor already had
   a space in its name.

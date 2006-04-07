@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.s3.S3Log;
 
 /**
  * You fetch objects from S3 using the GET operation.
@@ -60,7 +60,6 @@ public class ObjectGET extends BaseS3Operation {
 
     private void closeConnection() {
         if (_conn != null) {
-            System.out.println("Connection closed");
             try {
                 _conn.disconnect();
             } catch (Exception ex) {

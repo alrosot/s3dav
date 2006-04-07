@@ -22,14 +22,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.s3.S3Log;
 import org.carion.s3dav.util.Util;
 
 abstract public class BaseS3Operation implements S3Processing {
     private final Credential _credential;
 
-    private final S3Log _log;
+    protected final S3Log _log;
 
     protected String _xmlData;
 
@@ -54,15 +54,13 @@ abstract public class BaseS3Operation implements S3Processing {
     public void amzError(int responseCode, S3Error error, String amzRequestId,
             String amzId2) {
         _responseCode = responseCode;
-        _log.log("amzRequestId=" + amzRequestId + ", amxId2=" + amzId2);
-        _log.log("ERROR: responseCode=" + responseCode);
+        _log.log("ERROR: code=" + responseCode + "amzRequestId=" + amzRequestId
+                + ", amxId2=" + amzId2);
     }
 
     public void amzOk(int responseCode, String amzRequestId, String amzId2) {
         _responseCode = responseCode;
-        //_log.log("amzRequestId=" + amzRequestId + ", amxId2=" + amzId2);
-        _log.log("OK: responseCode=" + responseCode + ", contentLength="
-                + getContentLength());
+        _log.log("OK {" + responseCode + "," + getContentLength() + "}");
     }
 
     public void amzXmlData(String xmlData) {
@@ -80,10 +78,6 @@ abstract public class BaseS3Operation implements S3Processing {
     public void amzMeta(String name, String value) {
         _meta.put(name, value);
     }
-
-    //    public void amzData(byte[] data) {
-    //        _content = data;
-    //    }
 
     public void amzData(InputStream in, int contentLength) {
         _inputStream = in;
@@ -103,7 +97,6 @@ abstract public class BaseS3Operation implements S3Processing {
             String value = (String) _metaToAddInRequest.get(key);
             s3Request.addMetaInformation(key, value);
         }
-
         return s3Request.process(_credential, this);
     }
 
