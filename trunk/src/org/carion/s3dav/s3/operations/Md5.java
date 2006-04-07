@@ -361,12 +361,4 @@ public class Md5 {
         Md5 md5 = new Md5(roBuf);
         return md5.getDigest();
     }
-
-    public static void main(String args[]) throws IOException {
-        byte[] b;
-
-        b = Md5.getDigest(new File("/tmp/ss03.png"));
-        System.out.println("@@@ b.length=" + b.length);
-        System.out.println(Md5.stringify(b));
-    }
 }

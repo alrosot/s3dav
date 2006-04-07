@@ -17,8 +17,8 @@ package org.carion.s3dav.s3.operations;
 
 import java.io.IOException;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.s3.S3Log;
 
 /**
  * The HEAD operation is used to retrieve information about a
@@ -33,6 +33,10 @@ import org.carion.s3dav.s3.S3Log;
  */
 public class ObjectHEAD extends BaseS3Operation {
     private final String _uri;
+
+    public ObjectHEAD mk(String uri, Credential credential, S3Log log) {
+        return new ObjectHEAD(uri, credential, log);
+    }
 
     public ObjectHEAD(String uri, Credential credential, S3Log log) {
         super(credential, log);

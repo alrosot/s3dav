@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.repository.BaseWebdavRespository;
 import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavResource;
@@ -62,12 +63,12 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
 
     private final static long REFRESH_BUCKETS_DELAY = 10000L;
 
-    public WebdavRepositoryImpl(Credential credential) {
+    public WebdavRepositoryImpl(Credential credential, S3Log log) {
         _credential = credential;
-        _log = new S3LogImpl(System.out);
+        _log = log;
     }
 
-    S3Log getLog() {
+    public S3Log getLog() {
         return _log;
     }
 

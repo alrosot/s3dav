@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.carion.s3dav.Version;
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.util.Util;
 
@@ -55,12 +55,12 @@ public class WebdavServer extends Thread {
 
     private final Map _handlers = new HashMap();
 
-    private final AccessLogger _logger;
+    private final S3Log _log;
 
     private boolean _repositoryAvailable;
 
-    public WebdavServer(int port, WebdavRepository repository) {
-        _logger = new AccessLogger();
+    public WebdavServer(int port, WebdavRepository repository, S3Log log) {
+        _log = log;
         _port = port;
         _repository = repository;
         initHandlers();
@@ -103,8 +103,7 @@ public class WebdavServer extends Thread {
         ServerSocket serversocket = null;
 
         try {
-            System.out.println("s3DAV - version:" + Version.VERSION);
-            System.out.println("Listening on port:" + _port);
+            _log.log("Listening on port:" + _port);
             serversocket = new ServerSocket(_port);
         } catch (Exception e) {
             e.printStackTrace();
@@ -160,6 +159,8 @@ public class WebdavServer extends Thread {
                             throw new EOFException();
                         }
                     } while (startLine.trim().length() == 0);
+
+                    _log.log(_log.ts() + "- Request:" + startLine);
 
                     request = new WebdavRequest(startLine, _client);
 
@@ -284,8 +285,9 @@ public class WebdavServer extends Thread {
             }
 
             // Log the response
-            _logger.log(request, response);
-
+            _log.log(_log.ts() + ": {" + response.getResponseStatus() + ","
+                    + response.getHeader("Content-Length") + "} for "
+                    + request.getStartLine());
         }
     }
 }

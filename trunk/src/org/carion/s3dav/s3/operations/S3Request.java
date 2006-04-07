@@ -90,14 +90,13 @@ public class S3Request {
         this(method, path, _httpDateFormat.format(new Date()) + "GMT");
     }
 
-    private S3Request(String method, String path, String date) {
+    S3Request(String method, String path, String date) {
         _method = method;
         _path = path;
         _httpDate = date;
-
     }
 
-    private void setContent(ByteBuffer content, String contentType,
+    void setContent(ByteBuffer content, String contentType,
             String contentMd5) {
         _content = content;
         _contentType = contentType;
@@ -284,7 +283,7 @@ public class S3Request {
         }
     }
 
-    private void addHeader(String key, String value) {
+    void addHeader(String key, String value) {
         Object data = _metaInfos.get(key);
         List values;
         if (data == null) {
@@ -296,7 +295,7 @@ public class S3Request {
         _metaInfos.put(key, values);
     }
 
-    private String makeCanonicalString() {
+    String makeCanonicalString() {
         StringBuffer buf = new StringBuffer();
 
         buf.append(_method);
@@ -369,7 +368,7 @@ public class S3Request {
      * @throws NoSuchAlgorithmException If the algorithm does not exist.  Unlikely
      * @throws InvalidKeyException If the key is invalid.
      */
-    private String hmacSha1(String awsSecretAccessKey, String canonicalString) {
+    String hmacSha1(String awsSecretAccessKey, String canonicalString) {
         // Acquire an HMAC/SHA1 from the raw key bytes.
         SecretKeySpec signingKey = new SecretKeySpec(awsSecretAccessKey
                 .getBytes(), HMAC_SHA1_ALGORITHM);
@@ -395,39 +394,6 @@ public class S3Request {
                 .encodeBytes(mac.doFinal(canonicalString.getBytes()));
 
         return b64;
-    }
-
-    public static void main(String[] args) {
-        S3Request X;
-        String awsSecretAccessKey = "OtxrzxIsfpFjA7SwPzILwy8Bw21TLhquhboDYROV";
-        String canon;
-        String hmacSha1;
-
-        X = new S3Request("PUT", "/quotes/nelson",
-                "Thu, 17 Nov 2005 18:49:58 GMT");
-        X.setContent(null, "text/html", "c8fdb181845a4ca6b8fec737b3581d76");
-        X.addHeader("X-Amz-Meta-Author", "foo@bar.com");
-        X.addHeader("X-Amz-Magic", "abracadabra");
-
-        canon = X.makeCanonicalString();
-        hmacSha1 = X.hmacSha1(awsSecretAccessKey, canon);
-        if (!hmacSha1.equals("jZNOcbfWmD/A/f3hSvVzXZjM2HU=")) {
-            System.out.println("!!!! Bad SHA1");
-        } else {
-            System.out.println("SHA1 is OK");
-        }
-
-        X = new S3Request("GET", "/quotes/nelson", null);
-        X.addHeader("X-Amz-Magic", "abracadabra");
-        X.addHeader("X-Amz-Date", "Thu, 17 Nov 2005 18:49:58 GMT");
-
-        canon = X.makeCanonicalString();
-        hmacSha1 = X.hmacSha1(awsSecretAccessKey, canon);
-        if (!hmacSha1.equals("5m+HAmc5JsrgyDelh9+a2dNrzN8=")) {
-            System.out.println("!!!! Bad SHA1");
-        } else {
-            System.out.println("SHA1 is OK");
-        }
     }
 
     public String getMethod() {

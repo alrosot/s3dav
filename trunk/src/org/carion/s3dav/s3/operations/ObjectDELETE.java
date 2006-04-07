@@ -17,8 +17,8 @@ package org.carion.s3dav.s3.operations;
 
 import java.io.IOException;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.s3.S3Log;
 
 /**
  * The DELETE request operation removes the specified object from Amazon S3.
