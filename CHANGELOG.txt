@@ -1,5 +1,9 @@
 ## Changelog
 
+### Release 0.4
+* NEW: there is a new page in the admin page ( http://127.0.0.1:8070 ) called =Logs Page=.
+  This page allows you to see the logs (which are also sent to the standard output)
+
 * NEW: logs are stored in a rotating file located in : =${user.home}/s3dav/log/log{0,1}.txt=
 
 * FIX: in the browse view (HTML), the name are now properly displayed.
@@ -39,25 +43,15 @@
 
 * NEW: the version number of s3DAV is displayed on startup
 
-* NEW: in the S3 requests, the USer-Agent is now set to s3DAV/<version number>
+* NEW: in the S3 requests, the USer-Agent is now set to =s3DAV/<version number>=
 
 * FIX: the server is not working properly when compiled with JDK 1.5 - we get
   a 403 error back from the server.
-  The reason is that, when sending a HEAD request, the HttpURLConnection is automatically adding the content type
-  application/x-www-form-urlencoded and this breaks the Authorization mechanism.
-
-HEAD /s3dav//build.xml HTTP/1.1\r\n
-Authorization: AWS XXX:YYY
-Date: Mon, 03 Apr 2006 17:14:32 GMT\r\n
-Content-Length: 0\r\n
-User-Agent: Java/1.5.0_06\r\n
-Host: s3.amazonaws.com\r\n
-Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2\r\n
-Connection: keep-alive\r\n
-Content-type: application/x-www-form-urlencoded\r\n
-\r\n
+  The reason is that, when sending a HEAD request, the =HttpURLConnection= class is
+  automatically adding the content type =application/x-www-form-urlencoded= and this
+  breaks the Authorization mechanism.
 
   Now, when a content-type is not set by the application, we always set the content-type to "application/x-www-form-urlencoded",
   even though there is no content associated to the message.
 
-* RELEASE [2006-03-31] : version 0.2 released
+### Release : 0.2
