@@ -2,7 +2,7 @@
 
 <project name="s3DAV" default="all" basedir=".">
     <target name="all" depends="jar"/>
-    <property name="version" value="0.3"/>
+    <property file="build.properties"/>
     
     <target name="clean">
         <delete dir="build"/>
