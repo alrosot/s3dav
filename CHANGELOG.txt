@@ -1,3 +1,9 @@
+## Changelog
+
+* NEW: logs are stored in a rotating file located in : =${user.home}/s3dav/log/log{0,1}.txt=
+
+* FIX: in the browse view (HTML), the name are now properly displayed.
+
 * NEW: the logs have been changed in order to help tracking of problems
 
 * FIX: a double encoding when getting the parent URI made impossible to
@@ -6,6 +12,8 @@
 
 * FIX: a HEAD request on a XML file has a content-type text/xml and this would trigger
   the reading of the body of the response. Now, we never read the body on HEAD requests.
+
+### Release 0.3
 
 * NEW: On the Website, there is now a FAQ page. Very limited now, the main
   purpose of this page was to discuss the naming convention used by s3DAV to
