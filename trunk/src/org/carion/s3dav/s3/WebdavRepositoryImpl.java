@@ -72,6 +72,10 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
         return _log;
     }
 
+    public String getRawLogs() {
+        return _log.getRawLogs();
+    }
+
     public boolean isAvailable() {
         return _credential.isAccessAllowed();
     }

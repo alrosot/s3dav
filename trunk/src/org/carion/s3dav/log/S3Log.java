@@ -9,4 +9,6 @@ public interface S3Log {
     String ts();
 
     void eol();
+
+    String getRawLogs();
 }

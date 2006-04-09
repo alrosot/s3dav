@@ -48,6 +48,7 @@ public class AdminPage {
         _pages.add(new AccountPage("account"));
         _pages.add(new BucketsPage("buckets"));
         _pages.add(new SupportPage("support"));
+        _pages.add(new LogsPage("logs"));
         _pages.add(new CreditsPage("credits"));
     }
 

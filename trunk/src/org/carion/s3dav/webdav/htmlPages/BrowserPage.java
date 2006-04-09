@@ -23,6 +23,7 @@ import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavObject;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.util.Util;
 import org.carion.s3dav.webdav.WebdavRequest;
 
 public class BrowserPage {
@@ -35,7 +36,7 @@ public class BrowserPage {
         _w.h1("s3DAV version:" + Version.VERSION);
         _w.div("breadcrumb");
         _w.line("<a href=\"/\">[Root]</a>/");
-        StringTokenizer st = new StringTokenizer(theUri,"/");
+        StringTokenizer st = new StringTokenizer(theUri, "/");
         StringBuffer link = new StringBuffer();
         while (st.hasMoreTokens()) {
             String elt = st.nextToken();
@@ -69,7 +70,8 @@ public class BrowserPage {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavFolder res = repository.getFolder(uri);
                 _w.out("<tr><td class=\"" + className + "\"><a href=\""
-                        + mkUrl(res, request) + "\">" + res.getName()
+                        + mkUrl(res, request) + "\">"
+                        + Util.urlDecode(res.getName())
                         + "</a></td><td class=\"" + className
                         + "\">&nbsp;</td><td class=\"" + className
                         + "\" align=\"right\">Folder</td></tr>");
@@ -82,7 +84,8 @@ public class BrowserPage {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavResource res = repository.getResource(uri);
                 _w.out("<tr><td class=\"" + className + "\"><a href=\""
-                        + mkUrl(res, request) + "\">" + res.getName()
+                        + mkUrl(res, request) + "\">"
+                        + Util.urlDecode(res.getName())
                         + "</a></td><td class=\"" + className
                         + "\" align=\"right\">" + res.getLength()
                         + "</td><td class=\"" + className
