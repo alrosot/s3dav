@@ -42,7 +42,8 @@ public class BrowserPage {
             String elt = st.nextToken();
             link.append("/");
             link.append(elt);
-            _w.line("<a href=\"" + link.toString() + "\">" + elt + "</a>/");
+            _w.line("<a href=\"" + link.toString() + "\">"
+                    + Util.urlDecode(elt) + "</a>/");
         }
         _w.div_end();
         _w.h2("the s3DAV Browsing Page");
@@ -51,12 +52,18 @@ public class BrowserPage {
         _w.div("menu");
 
         _w.menu("/index.html", "Admin Page");
+        _w.menu("index.html?page=logs", "Logs Page");
+
         _w.div_end(); // menu
 
         _w.div("content");
 
         _w.out("<table>");
-        _w.out("<tr><th>File name</th><th>size</th><th>type</th></tr>");
+        _w.out("<tr>");
+        _w.th("File name");
+        _w.th("size");
+        _w.th("type");
+        _w.out("</tr>");
 
         String[] files = folder.getChildrenUris();
 
@@ -69,12 +76,14 @@ public class BrowserPage {
             if (repository.isFolder(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavFolder res = repository.getFolder(uri);
-                _w.out("<tr><td class=\"" + className + "\"><a href=\""
+                _w.out("<tr>");
+                _w.out("<td class=\"" + className + "\"><a href=\""
                         + mkUrl(res, request) + "\">"
                         + Util.urlDecode(res.getName())
                         + "</a></td><td class=\"" + className
                         + "\">&nbsp;</td><td class=\"" + className
-                        + "\" align=\"right\">Folder</td></tr>");
+                        + "\" style=\"text-align:center\">Folder</td>");
+                _w.out("</tr>");
                 lineno++;
             }
         }

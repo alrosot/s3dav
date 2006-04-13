@@ -15,6 +15,7 @@
  */
 package org.carion.s3dav.webdav.htmlPages;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.s3.WebdavRepositoryImpl;
 
 abstract class Page {
@@ -28,6 +29,8 @@ abstract class Page {
 
     protected WebdavRepositoryImpl _repository;
 
+    protected S3Log _log;
+
     Page(String pageTitle, String pageName) {
         _pageTitle = pageTitle;
         _pageName = pageName;
@@ -38,6 +41,7 @@ abstract class Page {
         _w = w;
         _adminPage = adminPage;
         _repository = repository;
+        _log = repository.getLog();
     }
 
     public String getPageTitle() {
@@ -55,6 +59,10 @@ abstract class Page {
     abstract void page();
 
     abstract boolean needsRepository();
+
+    boolean isVisible() {
+        return true;
+    }
 
     void action() {
     }

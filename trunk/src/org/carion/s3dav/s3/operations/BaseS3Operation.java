@@ -15,8 +15,8 @@
  */
 package org.carion.s3dav.s3.operations;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,11 +31,7 @@ abstract public class BaseS3Operation implements S3Processing {
 
     protected final S3Log _log;
 
-    protected String _xmlData;
-
-    protected InputStream _inputStream;
-
-    protected int _contentLength;
+    private InputStream _inputStream;
 
     private final Map _meta = new HashMap();
 
@@ -44,6 +40,8 @@ abstract public class BaseS3Operation implements S3Processing {
     private final Map _metaToAddInRequest = new HashMap();
 
     private int _responseCode;
+
+    String _request;
 
     BaseS3Operation(Credential credential, S3Log log) {
         _credential = credential;
@@ -54,17 +52,13 @@ abstract public class BaseS3Operation implements S3Processing {
     public void amzError(int responseCode, S3Error error, String amzRequestId,
             String amzId2) {
         _responseCode = responseCode;
-        _log.log("ERROR: code=" + responseCode + "amzRequestId=" + amzRequestId
-                + ", amxId2=" + amzId2);
+        _log.log("ERROR: code=" + responseCode + " amzRequestId="
+                + amzRequestId + ", amxId2=" + amzId2);
     }
 
     public void amzOk(int responseCode, String amzRequestId, String amzId2) {
         _responseCode = responseCode;
         _log.log("OK {" + responseCode + "," + getContentLength() + "}");
-    }
-
-    public void amzXmlData(String xmlData) {
-        _xmlData = xmlData;
     }
 
     public void amzException(Exception ex) {
@@ -79,9 +73,8 @@ abstract public class BaseS3Operation implements S3Processing {
         _meta.put(name, value);
     }
 
-    public void amzData(InputStream in, int contentLength) {
+    public void amzInputStream(InputStream in) {
         _inputStream = in;
-        _contentLength = contentLength;
     }
 
     public void addMeta(String key, String value) {
@@ -89,6 +82,12 @@ abstract public class BaseS3Operation implements S3Processing {
     }
 
     protected boolean process(S3Request s3Request) {
+        return process(s3Request, true);
+    }
+
+    protected boolean process(S3Request s3Request, boolean doCloseConnection) {
+        _request = "Request:" + s3Request.getMethod() + " "
+                + s3Request.getPath() + " " + s3Request.getQueryString();
         _log.log("Request:" + s3Request.getMethod() + " " + s3Request.getPath()
                 + " " + s3Request.getQueryString());
         for (Iterator iter = _metaToAddInRequest.keySet().iterator(); iter
@@ -97,7 +96,7 @@ abstract public class BaseS3Operation implements S3Processing {
             String value = (String) _metaToAddInRequest.get(key);
             s3Request.addMetaInformation(key, value);
         }
-        return s3Request.process(_credential, this);
+        return s3Request.process(_credential, this, doCloseConnection);
     }
 
     public String getMeta(String meta) {
@@ -128,7 +127,20 @@ abstract public class BaseS3Operation implements S3Processing {
         return _responseCode;
     }
 
-    public boolean doCloseConnection(HttpURLConnection conn) {
-        return true;
+    public InputStream getInputStream() {
+        return _inputStream;
     }
+
+    /**
+     * Get the body as a string
+     * We can then close the InputStream
+     * @return
+     * @throws IOException
+     */
+    protected String getXmldata() throws IOException{
+        String xmlData = Util.readInputStreamAsString(_inputStream);
+        _inputStream.close();
+        return xmlData;
+    }
+
 }

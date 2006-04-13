@@ -34,10 +34,6 @@ import org.carion.s3dav.s3.Credential;
 public class ObjectHEAD extends BaseS3Operation {
     private final String _uri;
 
-    public ObjectHEAD mk(String uri, Credential credential, S3Log log) {
-        return new ObjectHEAD(uri, credential, log);
-    }
-
     public ObjectHEAD(String uri, Credential credential, S3Log log) {
         super(credential, log);
         _uri = uri;

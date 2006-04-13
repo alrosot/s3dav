@@ -40,6 +40,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.carion.s3dav.Version;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.util.Base64;
+import org.carion.s3dav.util.InputStreamObserver;
 import org.carion.s3dav.util.Util;
 
 public class S3Request {
@@ -96,8 +97,7 @@ public class S3Request {
         _httpDate = date;
     }
 
-    void setContent(ByteBuffer content, String contentType,
-            String contentMd5) {
+    void setContent(ByteBuffer content, String contentType, String contentMd5) {
         _content = content;
         _contentType = contentType;
         _contentMd5 = contentMd5;
@@ -126,9 +126,9 @@ public class S3Request {
         addHeader(METADATA_PREFIX + key, value);
     }
 
-    public boolean process(Credential credential, S3Processing processing) {
+    public boolean process(Credential credential, S3Processing processing,
+            boolean doCloseConnection) {
         HttpURLConnection conn = null;
-        boolean mustCloseConnection = true;
         try {
             // on these methods, the java.net classes will add this content type
             // automatically so we need to use to have a goog hmac sha1 key
@@ -229,8 +229,9 @@ public class S3Request {
 
             // 2xx response codes are ok, everything else is an error
             if (responseCode / 100 != 2) {
-                String error = Util.readInputStreamAsString(conn
-                        .getErrorStream(), conn.getContentLength());
+                InputStream in = Util.wrap(conn.getErrorStream(), false, conn
+                        .getContentLength());
+                String error = Util.readInputStreamAsString(in);
                 S3Error errorResponse;
                 if ("application/xml".equals(contentType)
                         && (error.length() > 2)) {
@@ -247,18 +248,13 @@ public class S3Request {
             }
 
             if (!_method.equals("HEAD")) {
-                if ("application/xml".equals(contentType)
-                        || "text/xml".equals(contentType)) {
-                    String response = Util.readInputStreamAsString(conn
-                            .getInputStream(), conn.getContentLength());
-                    processing.amzXmlData(response);
-                } else {
-                    //                processing.amzData(Util.readInputStreamAsBytes(conn
-                    //                        .getInputStream(), conn.getContentLength()));
-                    processing.amzData(conn.getInputStream(), conn
-                            .getContentLength());
-                    mustCloseConnection = false;
+                InputStreamObserver observer = null;
+                if (!doCloseConnection) {
+                    observer = new ConnectionCloser(conn);
                 }
+                InputStream in = Util.wrap(conn.getInputStream(), false, conn
+                        .getContentLength(), observer);
+                processing.amzInputStream(in);
             }
             return true;
         } catch (Exception ex) {
@@ -268,11 +264,11 @@ public class S3Request {
             // in case or the connection can be left opened,
             // we check if the processing want's to keep
             // connection opened or not !
-            if (!mustCloseConnection) {
-                mustCloseConnection = processing.doCloseConnection(conn);
-            }
-
-            if (mustCloseConnection) {
+            // When we do a Object GET, we want to keep the
+            // InputStream opened as the content of this stream
+            // will be pushed to the webDAV assiciated GET
+            // request
+            if (doCloseConnection) {
                 if (conn != null) {
                     try {
                         conn.disconnect();
@@ -433,5 +429,22 @@ public class S3Request {
                 return len;
             }
         };
+    }
+
+    private class ConnectionCloser implements InputStreamObserver {
+        private final HttpURLConnection _conn;
+
+        ConnectionCloser(HttpURLConnection conn) {
+            _conn = conn;
+        }
+
+        public void closeConnection() {
+            if (_conn != null) {
+                try {
+                    _conn.disconnect();
+                } catch (Exception ex) {
+                }
+            }
+        }
     }
 }

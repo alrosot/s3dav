@@ -54,24 +54,37 @@ class BucketsPage extends Page {
             List buckets = _repository.getBuckets();
 
             if (buckets.size() == 0) {
-                _w.p("You have no bucket associated to your account. Check menu on the left to create a bucket");
+                _w.p("You have no bucket associated to your account."
+                        + " Check menu on the left to create a bucket");
             } else {
                 _w.out("<p><table cellpadding=\"10\">");
                 _w.out("<thead>");
-                _w.out("<tr><th>bucket name</th><th>creation date</th></tr>");
+                _w.out("<tr>");
+                _w.th("bucket name");
+                _w.th("creation date");
+                _w.th("raw listing");
+                _w.out("</tr>");
                 _w.out("</thead>");
                 _w.out("<tbody>");
                 for (Iterator iter = buckets.iterator(); iter.hasNext();) {
                     Bucket bucket = (Bucket) iter.next();
-                    _w.out("<tr><td>" + bucket.getName() + "</td><td>"
-                            + bucket.getCreationDate() + "</td></tr>");
+                    _w.out("<tr>");
+                    _w.td(bucket.getName());
+                    _w.td(bucket.getCreationDate().toString());
+                    _w.td(null, null, "raw listing",
+                            "index.html?page=rawlisting&bucket="
+                                    + bucket.getName());
+                    _w.out("</tr>");
                 }
                 _w.out("</tbody>");
                 _w.out("</table></p>");
             }
 
         } catch (IOException ex) {
-            _w.error("An error occured while trying to retrieve the list of your buckets - Please double check your AWS identification");
+            _repository.getLog().log("Error retrieving buxkets", ex);
+            _w.error("An error occured while trying to "
+                    + "retrieve the list of your buckets "
+                    + "- Please double check your AWS identification");
         }
         _w.article_end();
 
@@ -81,11 +94,11 @@ class BucketsPage extends Page {
                 + "\" method=\"post\">");
         _w.out("<div>");
         _w.out("<label for=\"bucketname\">Name:</label>");
-        _w.out("<input type=\"text\" class=\"textbox\" id=\"bucketname\" name=\"bucketname\" /></div>");
-        _w.out("<div><input type=\"submit\" value=\"Create bucket\" name=\"submit\" class=\"button\" /></div>");
+        _w.out("<input type=\"text\"" + " class=\"textbox\" id=\"bucketname\" "
+                + "name=\"bucketname\" /></div>");
+        _w.out("<div><input type=\"submit\" " + "value=\"Create bucket\" "
+                + "name=\"submit\" class=\"button\" /></div>");
         _w.out("</form>");
-
         _w.article_end();
-
     }
 }

@@ -106,7 +106,7 @@ public class WebdavServer extends Thread {
             _log.log("Listening on port:" + _port);
             serversocket = new ServerSocket(_port);
         } catch (Exception e) {
-            e.printStackTrace();
+            _log.log("Can't listen on socket", e);
             return;
         }
 
@@ -123,7 +123,7 @@ public class WebdavServer extends Thread {
                 WebdavHandler handler = new WebdavHandler(client, input, output);
                 handler.start();
             } catch (Exception e) {
-                e.printStackTrace();
+                _log.log("Can't accept connections", e);
             }
         }
     }
@@ -185,19 +185,30 @@ public class WebdavServer extends Thread {
                                     + line.trim());
                         }
                     }
+                    keepAlive = request.getKeepAlive();
+                    int contentLength = request.getContentLength();
 
+                    // let's find a handler to process this request
+                    HandlerBase handler = (HandlerBase) _handlers.get(request
+                            .getMethod());
+
+                    _log.log("@@ content-length is:"
+                            + request.getContentLength() + ","
+                            + request.getHttpHeader("Content-Length") + ","
+                            + "Keep-Alive:" + keepAlive);
+
+                    InputStream wrappedInputStream = Util.wrap(_stream,
+                            keepAlive, contentLength);
                     // IMPORTANT:
                     // we don't want to rely on the handlers
                     // do read the content because we have to be
                     // absolutely sure that the content has been
                     // read in order to be able to read subsequent
                     // request using the same socket. (Keep-Alive)
-                    request.setContent(Util.readInputStreamAsBytes(_stream,
-                            request.getContentLength()));
+                    // the problem is that the content-length is not always
+                    // set and we don't know if we must read the body or not
+                    request.setInputStream(wrappedInputStream);
 
-                    // let's find a handler to process this request
-                    HandlerBase handler = (HandlerBase) _handlers.get(request
-                            .getMethod());
                     // prepare response
                     WebdavResponse response = new WebdavResponse();
 
@@ -215,6 +226,10 @@ public class WebdavServer extends Thread {
                     // send response back to client
                     sendResponse(response, request);
 
+                    // this input stream won't be actually closed
+                    // if the keep-alive set to true
+                    wrappedInputStream.close();
+
                     // check if the socket connection
                     // should be closed or not
                     // TODO: timeout to free this connection if no
@@ -222,7 +237,7 @@ public class WebdavServer extends Thread {
                     keepAlive = request.getKeepAlive();
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                _log.log("Error processign request", ex);
                 WebdavResponse response = new WebdavResponse();
                 response.setResponseStatus(WebdavResponse.SC_INTERNAL_ERROR);
                 sendResponse(response, request);
@@ -280,7 +295,7 @@ public class WebdavServer extends Thread {
 
                     // for now ... let's just print the exception
                     // TODO: proper error management required here
-                    ex.printStackTrace();
+                    _log.log("Ubexpected error", ex);
                 }
             }
 

@@ -63,8 +63,7 @@ public abstract class WebdavObjectImpl implements WebdavObject {
             return new Date();
         } else {
             String key = _name.getResourceKey();
-            ObjectHEAD ope = new ObjectHEAD(key, _credential, _repository
-                    .getLog());
+            ObjectHEAD ope = _repository.mkObjectHEAD(key);
             if (!ope.execute()) {
                 throw new IOException("Can't get info for:" + key);
             }

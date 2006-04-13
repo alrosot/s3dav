@@ -73,10 +73,14 @@ public class HandlerPropfind extends HandlerBase {
         } else {
             _mode = MODE_ALL_PROPERTIES;
         }
-
-        XMLWriter writer = response.getXMLWriter("multistatus");
-        process(writer, request.getDepth(), request.getUrl());
-        response.setResponseStatus(WebdavResponse.SC_MULTI_STATUS);
+        String url = request.getUrl();
+        if (!_repository.objectExists(url)) {
+            response.setResponseStatus(WebdavResponse.SC_NOT_FOUND);
+        } else {
+            XMLWriter writer = response.getXMLWriter("multistatus");
+            process(writer, request.getDepth(), url);
+            response.setResponseStatus(WebdavResponse.SC_MULTI_STATUS);
+        }
     }
 
     private void process(XMLWriter writer, int depth, String href)

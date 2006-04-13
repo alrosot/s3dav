@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.carion.s3dav.repository.WebdavResource;
-import org.carion.s3dav.s3.operations.MemoryMappedFile;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
 import org.carion.s3dav.s3.operations.ObjectGET;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 import org.carion.s3dav.s3.operations.ObjectPUT;
+import org.carion.s3dav.util.MemoryMappedFile;
 import org.carion.s3dav.util.MimeTypes;
 import org.carion.s3dav.util.Util;
 
@@ -41,9 +41,11 @@ public class WebdavResourceImpl extends WebdavObjectImpl implements
 
     public InputStream getContent() throws IOException {
         String key = _name.getResourceKey();
-        ObjectGET ope = new ObjectGET(key, _credential, _repository.getLog());
+        ObjectGET ope;
+        ope = _repository.mkObjectGET(key);
+
         if (!ope.execute()) {
-            throw new IOException("Can't DELETE:" + key);
+            throw new IOException("Can't GET:" + key);
         }
         return ope.getInputStream();
     }
@@ -54,7 +56,7 @@ public class WebdavResourceImpl extends WebdavObjectImpl implements
 
     public long getLength() throws IOException {
         String key = _name.getResourceKey();
-        ObjectHEAD ope = new ObjectHEAD(key, _credential, _repository.getLog());
+        ObjectHEAD ope = _repository.mkObjectHEAD(key);
         if (!ope.execute()) {
             throw new IOException("Can't HEAD:" + key);
         }
@@ -63,11 +65,13 @@ public class WebdavResourceImpl extends WebdavObjectImpl implements
 
     public void setResourceContent(InputStream content, String contentType,
             long length) throws IOException {
-        ObjectPUT ope = new ObjectPUT(_name.getResourceKey(), _credential,
-                _repository.getLog());
+        ObjectPUT ope = _repository.mkObjectPUT(_name.getResourceKey());
 
         MemoryMappedFile mappedFile = null;
 
+        _repository.getLog().log(
+                "Creating memory mapped file for:" + _name.getUri()
+                        + ",length=" + length + " inputStream=" + content);
         try {
             mappedFile = Util.mkMemoryMapFile(content, length);
 
@@ -78,13 +82,15 @@ public class WebdavResourceImpl extends WebdavObjectImpl implements
             if (mappedFile != null) {
                 mappedFile.delete();
             }
+            content.close();
         }
     }
 
     public void remove() throws IOException {
         String key = _name.getResourceKey();
-        ObjectDELETE ope = new ObjectDELETE(key, _credential, _repository
-                .getLog());
+        ObjectDELETE ope;
+        ope = _repository.mkObjectDELETE(key);
+
         if (!ope.execute()) {
             throw new IOException("Can't DELETE:" + key);
         }

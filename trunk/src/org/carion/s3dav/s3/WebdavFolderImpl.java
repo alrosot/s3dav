@@ -21,10 +21,8 @@ import java.util.List;
 
 import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavResource;
-import org.carion.s3dav.s3.operations.BucketDELETE;
 import org.carion.s3dav.s3.operations.BucketGET;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
-import org.carion.s3dav.s3.operations.ServiceGET;
 
 public class WebdavFolderImpl extends WebdavObjectImpl implements WebdavFolder {
     WebdavFolderImpl(String uri, Credential credential,
@@ -50,8 +48,7 @@ public class WebdavFolderImpl extends WebdavObjectImpl implements WebdavFolder {
 
         if (_name.isRoot()) {
             // we want the buckets here
-            ServiceGET ope = new ServiceGET(_credential, _repository.getLog());
-            List buckets = ope.execute();
+            List buckets = _repository.getBuckets();
             result = new String[buckets.size()];
             int index = 0;
             for (Iterator iter = buckets.iterator(); iter.hasNext();) {
@@ -114,14 +111,11 @@ public class WebdavFolderImpl extends WebdavObjectImpl implements WebdavFolder {
         }
 
         if (_name.isBucket()) {
-            BucketDELETE ope = new BucketDELETE(getName(), _credential,
-                    _repository.getLog());
-            if (!ope.execute()) {
-                throw new IOException("Can't delete bucket:" + getName());
-            }
+            _repository.deleteBucket(getName());
         } else {
-            ObjectDELETE ope = new ObjectDELETE(_name.getResourceKey(),
-                    _credential, _repository.getLog());
+            ObjectDELETE ope;
+            ope = _repository.mkObjectDELETE(_name.getResourceKey());
+
             if (!ope.execute()) {
                 throw new IOException("Can't delete :" + _name.getResourceKey());
             }

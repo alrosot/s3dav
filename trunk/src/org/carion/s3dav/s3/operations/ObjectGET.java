@@ -15,9 +15,7 @@
  */
 package org.carion.s3dav.s3.operations;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 import org.carion.s3dav.log.S3Log;
@@ -46,78 +44,6 @@ public class ObjectGET extends BaseS3Operation {
 
     public boolean execute() throws IOException {
         S3Request X = S3Request.mkGetRequest(_uri);
-        return process(X);
-    }
-
-    public InputStream getInputStream() {
-        return new ContentLengthInputStream(_inputStream, _contentLength);
-    }
-
-    public boolean doCloseConnection(HttpURLConnection conn) {
-        _conn = conn;
-        return false;
-    }
-
-    private void closeConnection() {
-        if (_conn != null) {
-            try {
-                _conn.disconnect();
-            } catch (Exception ex) {
-            }
-        }
-    }
-
-    /**
-     * Right now, this class is just a wrapper of the InputStream
-     * coming from S3 on a GET request.
-     * Eventually, we may want to check the amount of data read
-     * to ensure that we don't read more than 'content length' data.
-     * It appears that S3 behaves properly and don't send garbage data
-     * so we keep this class simple for now.
-     *
-     * @author pcarion
-     */
-    private class ContentLengthInputStream extends FilterInputStream {
-
-        ContentLengthInputStream(InputStream in, int contentLength) {
-            super(in);
-        }
-
-        public int read() throws IOException {
-            return in.read();
-        }
-
-        public int read(byte[] bts) throws IOException {
-            return in.read(bts);
-        }
-
-        public int read(byte[] bts, int st, int end) throws IOException {
-            return in.read(bts, st, end);
-        }
-
-        public long skip(long ln) throws IOException {
-            return in.skip(ln);
-        }
-
-        public int available() throws IOException {
-            return in.available();
-        }
-
-        public void close() throws IOException {
-            in.close();
-            closeConnection();
-        }
-
-        public synchronized void mark(int idx) {
-            in.mark(idx);
-        }
-
-        public synchronized void reset() throws IOException {
-            in.reset();
-        }
-
-        public boolean markSupported() {
-            return in.markSupported();
-        }
+        return process(X, false);
     }
 }

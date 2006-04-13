@@ -15,6 +15,7 @@
  */
 package org.carion.s3dav.webdav.htmlPages;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,12 +51,18 @@ public class AdminPage {
         _pages.add(new SupportPage("support"));
         _pages.add(new LogsPage("logs"));
         _pages.add(new CreditsPage("credits"));
+        _pages.add(new RawListingPage("rawlisting"));
+        _pages.add(new DeleteObjectPage("deleteobject"));
     }
 
     public AdminPage(WebdavRequest request, WebdavRepository repository) {
         _repository = (WebdavRepositoryImpl) repository;
         _request = request;
-        _request.parseParameters(_parameters);
+        try {
+            _request.parseParameters(_parameters);
+        } catch (IOException ex) {
+            _repository.getLog().log("Can't parse request parameters", ex);
+        }
     }
 
     private Page getPage() {
@@ -108,6 +115,9 @@ public class AdminPage {
 
         for (Iterator iter = _pages.iterator(); iter.hasNext();) {
             Page aPage = (Page) iter.next();
+            if (!aPage.isVisible()) {
+                continue;
+            }
             // we don't display pages which needs the repository if
             // the repository is not available !
             if (_repository.isAvailable() || !aPage.needsRepository()) {
