@@ -18,9 +18,11 @@ package org.carion.s3dav.s3;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.repository.BaseWebdavRespository;
+import org.carion.s3dav.repository.ResourceName;
 import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavResource;
 import org.carion.s3dav.s3.operations.BucketDELETE;
@@ -31,6 +33,7 @@ import org.carion.s3dav.s3.operations.ObjectGET;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 import org.carion.s3dav.s3.operations.ObjectPUT;
 import org.carion.s3dav.s3.operations.ServiceGET;
+import org.carion.s3dav.util.Util;
 
 /*
 
@@ -296,6 +299,28 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
 
         List objects = ope.execute("");
         return objects;
+    }
+
+    public void deleteObject(String bucket, String key) throws IOException {
+        StringBuffer uri = new StringBuffer();
+        uri.append("/");
+        uri.append(Util.urlEncode(bucket));
+        uri.append("/");
+        StringTokenizer st = new StringTokenizer(key, "/", true);
+        while (st.hasMoreTokens()) {
+            String tk = st.nextToken();
+            if ("/".equals(tk)) {
+                uri.append(tk);
+            } else {
+                uri.append(Util.urlEncode(tk));
+            }
+        }
+        _log.log("Delete object bucket=(" + bucket + ") key=(" + key + "):("
+                + uri.toString() + ")");
+        ObjectDELETE ope = mkObjectDELETE(uri.toString());
+        if (!ope.execute()) {
+            throw new IOException("Can't delete object:" + uri.toString());
+        }
     }
 
 }
