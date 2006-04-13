@@ -15,7 +15,7 @@
  */
 package org.carion.s3dav.webdav;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -46,7 +46,7 @@ public class WebdavRequest {
 
     private final InetAddress _client;
 
-    private byte[] _content;
+    private InputStream _inputStream;
 
     private Map _httpHeaders = new LinkedHashMap();
 
@@ -60,8 +60,8 @@ public class WebdavRequest {
         _protocol = tokenizer.nextToken();
     }
 
-    void setContent(byte[] content) {
-        _content = content;
+    void setInputStream(InputStream inputStream) {
+        _inputStream = inputStream;
     }
 
     public String getStartLine() {
@@ -98,16 +98,12 @@ public class WebdavRequest {
         }
     }
 
-    public String getBodyAsString() {
-        if (_content == null) {
-            return "";
-        } else {
-            return new String(_content);
-        }
+    public String getBodyAsString() throws IOException {
+        return Util.readInputStreamAsString(_inputStream);
     }
 
-    public InputStream getBodyAsInputStream() {
-        return new ByteArrayInputStream(_content);
+    public InputStream getInputStream() {
+        return _inputStream;
     }
 
     int getDepth() {
@@ -136,7 +132,7 @@ public class WebdavRequest {
     public int getContentLength() {
         String cl = getHttpHeader("Content-Length");
         if (cl == null) {
-            return 0;
+            return -1;
         } else {
             return Integer.parseInt(cl);
         }
@@ -195,7 +191,7 @@ public class WebdavRequest {
         return destination;
     }
 
-    public void parseParameters(HashMap parameters) {
+    public void parseParameters(HashMap parameters) throws IOException {
         int queryIndex = _url.indexOf('?');
         if (queryIndex > 0) {
             if ((queryIndex + 1) < _url.length()) {
@@ -240,5 +236,4 @@ public class WebdavRequest {
         params.add(value);
         parameters.put(key, params);
     }
-
 }

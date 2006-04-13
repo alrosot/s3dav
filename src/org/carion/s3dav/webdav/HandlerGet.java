@@ -104,7 +104,7 @@ public class HandlerGet extends HandlerBase {
             WebdavRequest request) throws IOException {
         BrowserPage page = new BrowserPage();
         String body = page.getFolderHtmlPage(folder, request, _repository);
-//        String body = getFolderHtmlPage(folder, request);
+        //        String body = getFolderHtmlPage(folder, request);
 
         response.setResponseHeader("last-modified", Util.getHttpDate());
 

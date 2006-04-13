@@ -40,4 +40,5 @@ public abstract class HandlerBase {
      */
     abstract void process(WebdavRequest request, WebdavResponse response)
             throws IOException;
+
 }

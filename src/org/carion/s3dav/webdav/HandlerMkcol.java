@@ -64,12 +64,6 @@ public class HandlerMkcol extends HandlerBase {
             return;
         }
 
-        if (request.getBodyAsString().length() != 0) {
-            response
-                    .setResponseStatus(WebdavResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            return;
-        }
-
         String parent = _repository.getParentUri(uri);
         if (parent != null) {
             if (!_repository.isFolder(parent)) {

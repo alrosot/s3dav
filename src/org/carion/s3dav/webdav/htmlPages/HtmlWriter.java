@@ -85,6 +85,41 @@ public class HtmlWriter {
         _buf.append(text);
     }
 
+    void th(String text) {
+        _buf.append("<th>" + text + "</th>");
+    }
+
+    void td(String value) {
+        td(null, null, value);
+    }
+
+    void td(String className, String value) {
+        td(className, null, value);
+    }
+
+    void td(String className, String style, String value) {
+        td(className, style, value, null);
+    }
+
+    void td(String className, String style, String value, String link) {
+        _buf.append("<td");
+        if (className != null) {
+            _buf.append(" class=\"" + className + "\"");
+        }
+        if (style != null) {
+            _buf.append(" style=\"" + style + "\"");
+        }
+        _buf.append(">");
+        if (link != null) {
+            _buf.append("<a href=\"" + link + "\">");
+        }
+        _buf.append(value);
+        if (link != null) {
+            _buf.append("</a>");
+        }
+        _buf.append("</td>");
+    }
+
     private void setCSS() {
         _buf.append("body {");
         _buf.append("  background-color: #F0FFF0;");
@@ -292,7 +327,6 @@ public class HtmlWriter {
         _buf.append("  font-family:arial;");
         _buf.append("  font-size:10pt;");
         _buf.append("  background-color:#808080;");
-        _buf.append("  width:500px;");
         _buf.append("  border-style:solid;");
         _buf.append("  border-color:black;");
         _buf.append("  border-width:2px;");
@@ -304,6 +338,7 @@ public class HtmlWriter {
         _buf.append("}");
 
         _buf.append("tr {");
+        _buf.append("  spacing:5px;");
         _buf.append("}");
 
         _buf.append("td {");
@@ -313,6 +348,15 @@ public class HtmlWriter {
         _buf.append("  border-style:solid;");
         _buf.append("  border-width:1px;");
         _buf.append("  text-align:left;");
+        _buf.append("  padding:5px;");
+        _buf.append("}");
+
+        _buf.append("td.cell_0 {");
+        _buf.append("  background-color:#FF9999;");
+        _buf.append("}");
+
+        _buf.append("td.cell_1 {");
+        _buf.append("  background-color:#CCCCFF;");
         _buf.append("}");
     }
 

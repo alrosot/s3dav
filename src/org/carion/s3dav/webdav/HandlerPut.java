@@ -39,7 +39,7 @@ public class HandlerPut extends HandlerBase {
                 response.setResponseStatus(WebdavResponse.SC_FORBIDDEN);
             } else {
                 WebdavResource res = _repository.getResource(url);
-                res.setResourceContent(request.getBodyAsInputStream(), request
+                res.setResourceContent(request.getInputStream(), request
                         .getContentType(), request.getContentLength());
                 response.setResponseStatus(WebdavResponse.SC_CREATED);
             }
@@ -52,7 +52,7 @@ public class HandlerPut extends HandlerBase {
                 }
             }
             WebdavResource res = _repository.createResource(url);
-            res.setResourceContent(request.getBodyAsInputStream(), request
+            res.setResourceContent(request.getInputStream(), request
                     .getContentType(), request.getContentLength());
             response.setResponseStatus(WebdavResponse.SC_CREATED);
         }

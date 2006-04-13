@@ -61,11 +61,11 @@ public class BucketGET extends BaseS3Operation {
                     + Util.urlEncode(prefix)
                     + ((marker == null) ? "" : "&marker="
                             + Util.urlEncode(marker)));
-            if (!process(X)) {
+            if (!process(X, false)) {
                 throw new IOException("Can't get list fo files");
             }
-
-            S3ResponseParser parser = new S3ResponseParser(_xmlData);
+            String xmlData = getXmldata();
+            S3ResponseParser parser = new S3ResponseParser(xmlData);
             try {
                 Handler handler = new Handler();
                 parser.parse(handler);

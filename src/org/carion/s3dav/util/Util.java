@@ -16,9 +16,9 @@
 package org.carion.s3dav.util;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -32,50 +32,52 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import org.carion.s3dav.s3.operations.MemoryMappedFile;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 public class Util {
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+
     private static final SimpleDateFormat httpDateFormat = new SimpleDateFormat(
             "EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
 
-    public static String readInputStreamAsString(InputStream in,
-            int contentLength) throws IOException {
-        String result = "";
-        if (in != null) {
-            byte[] data = readInputStreamAsBytes(in, contentLength);
-            if (data != null) {
-                result = new String(data);
-            }
-        }
-        return result;
+    public static InputStream wrap(InputStream in, boolean keepAlive,
+            long contentLength) throws IOException {
+        return wrap(in, keepAlive, contentLength, null);
     }
 
-    public static byte[] readInputStreamAsBytes(InputStream in,
-            long contentLength) throws IOException {
-        if (contentLength == 0) {
-            return null;
-        } else if (contentLength > 0) {
-            byte[] data = new byte[(int) contentLength];
-            DataInputStream datainput = new DataInputStream(in);
-            try {
-                datainput.readFully(data);
-                return data;
-            } finally {
-                //                datainput.close();
-            }
+    public static InputStream wrap(InputStream in, boolean keepAlive,
+            long contentLength, InputStreamObserver observer)
+            throws IOException {
+        if (!keepAlive) {
+            return new WrappedInputStream(in, keepAlive, observer);
+        } else if (contentLength >= 0) {
+            return new ContentLengthInputStream(in, contentLength, keepAlive,
+                    observer);
         } else {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1000];
-
-            int numRead = 0;
-            while ((numRead = in.read(buffer)) >= 0) {
-                bos.write(buffer, 0, numRead);
-            }
-            return bos.toByteArray();
+            throw new IOException("Can't wrap keepAlive:" + keepAlive
+                    + " contentLength:" + contentLength);
         }
+    }
+
+    public static String readInputStreamAsString(InputStream in)
+            throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        copyStream(in, bos);
+        return new String(bos.toByteArray());
+    }
+
+    public static int copyStream(InputStream input, OutputStream output)
+            throws IOException {
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        int count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
     }
 
     public static MemoryMappedFile mkMemoryMapFile(InputStream in,

@@ -47,10 +47,11 @@ public class ServiceGET extends BaseS3Operation {
     public List execute() throws IOException {
         // we want the buckets here
         S3Request X = S3Request.mkGetRequest("/");
-        if (!process(X)) {
+        if (!process(X, false)) {
             throw new IOException("Can't get buckets");
         }
-        S3ResponseParser parser = new S3ResponseParser(_xmlData);
+        String xmlData = getXmldata();
+        S3ResponseParser parser = new S3ResponseParser(xmlData);
         try {
             parser.parse(new Handler());
             return _buckets;

@@ -16,7 +16,6 @@
 package org.carion.s3dav.s3.operations;
 
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 
 public interface S3Processing {
     void amzError(int responseCode, S3Error error, String amzRequestId,
@@ -24,16 +23,11 @@ public interface S3Processing {
 
     void amzOk(int responseCode, String amzRequestId, String amzId2);
 
-    void amzXmlData(String xmlData);
-
     void amzException(Exception ex);
 
     void amzHeader(String name, String value);
 
     void amzMeta(String name, String value);
 
-    //void amzData(byte[] data);
-    void amzData(InputStream in, int contentLength);
-
-    boolean doCloseConnection(HttpURLConnection conn);
+    void amzInputStream(InputStream in);
 }

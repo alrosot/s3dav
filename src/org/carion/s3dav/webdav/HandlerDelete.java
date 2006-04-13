@@ -37,7 +37,7 @@ public class HandlerDelete extends HandlerBase {
             _repository.deleteObject(url);
             response.setResponseStatus(WebdavResponse.SC_OK);
         } else {
-            response.setResponseStatus(WebdavResponse.SC_NOT_FOUND);
+            response.setResponseStatus(WebdavResponse.SC_OK);
         }
 
     }
