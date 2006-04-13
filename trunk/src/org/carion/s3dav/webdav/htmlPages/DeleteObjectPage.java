@@ -15,6 +15,7 @@
  */
 package org.carion.s3dav.webdav.htmlPages;
 
+import java.io.IOException;
 
 public class DeleteObjectPage extends Page {
     DeleteObjectPage(String pageName) {
@@ -34,14 +35,16 @@ public class DeleteObjectPage extends Page {
         String key = getParam("key");
         _w.article("Delete Object");
         _w.out("<br/>");
-        _w.out("Bucket:" + bucket);
-        _w.out("Key:" + key);
-        /*        try {
-         } catch (IOException ex) {
-         _log.log("Error retrieving content of bucket:" + bucket, ex);
-         _w.error("Error retrieving content of bucket:" + bucket);
-         }
-         */
+        _w.p("Bucket:" + bucket);
+        _w.p("Key:" + key);
+        try {
+            _repository.deleteObject(bucket, key);
+            _w.p("Object deleted ...");
+        } catch (IOException ex) {
+            _log.log("Error retrieving content of bucket:" + bucket, ex);
+            _w.error("Error retrieving content of bucket:" + bucket);
+        }
+
         _w.article_end();
     }
 }
