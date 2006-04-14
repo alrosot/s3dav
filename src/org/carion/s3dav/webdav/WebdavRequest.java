@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.util.Util;
 
 /**
@@ -46,14 +47,16 @@ public class WebdavRequest {
 
     private final InetAddress _client;
 
+    private final S3Log _log;
+
     private InputStream _inputStream;
 
     private Map _httpHeaders = new LinkedHashMap();
 
-    WebdavRequest(String startLine, InetAddress client) {
+    WebdavRequest(String startLine, InetAddress client, S3Log log) {
         _startLine = startLine;
         _client = client;
-
+        _log = log;
         StringTokenizer tokenizer = new StringTokenizer(_startLine);
         _method = tokenizer.nextToken();
         _url = Util.urlDecode(tokenizer.nextToken());
@@ -160,6 +163,7 @@ public class WebdavRequest {
     public String getDestination() {
         String destination = getHeader("Destination");
 
+        _log.log("Destination header: (" + destination + ")");
         if (destination == null) {
             return null;
         }
