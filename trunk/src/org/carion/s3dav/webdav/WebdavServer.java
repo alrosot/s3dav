@@ -162,7 +162,7 @@ public class WebdavServer extends Thread {
 
                     _log.log(_log.ts() + "- Request:" + startLine);
 
-                    request = new WebdavRequest(startLine, _client);
+                    request = new WebdavRequest(startLine, _client, _log);
 
                     // 2) read HTTP headers
                     String currentKey = null;

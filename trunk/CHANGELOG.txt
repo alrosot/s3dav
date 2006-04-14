@@ -1,5 +1,5 @@
 ## Changelog
-* NEW: from the "buckets page", from the "raw listing" link,
+* NEW: in the "buckets page", from the "raw listing" link,
   you can now list *all* the objects sored in your bucket.
   You'll see there any object, even those not stored through s3DAV and
   which would then not being 'seen' by the s3DAV file system
