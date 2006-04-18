@@ -17,8 +17,8 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
-import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
+import org.carion.s3.S3Repository;
+import org.carion.s3.impl.S3UrlNameImpl;
 
 /**
  * Handles 'COPY' request.
@@ -26,14 +26,14 @@ import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
  * @author pcarion
  */
 public class HandlerCopy extends HandlerBase {
-    HandlerCopy(WebdavRepository repository) {
+    HandlerCopy(S3Repository repository) {
         super(repository);
     }
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
         boolean overwrite = request.getOverwrite();
-        WebdavResourceName destination = request.getDestination();
+        S3UrlNameImpl destination = request.getDestination();
 
         if (destination == null) {
             response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);

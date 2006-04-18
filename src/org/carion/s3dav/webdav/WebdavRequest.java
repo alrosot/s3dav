@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.carion.s3.S3Log;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.impl.S3UrlNameImpl;
+import org.carion.s3.util.Util;
 
 /**
  * This class contains all the information describing the
@@ -44,7 +44,7 @@ public class WebdavRequest {
 
     private final String _method;
 
-    private final WebdavResourceName _resourceName;
+    private final S3UrlNameImpl _resourceName;
 
     private final String _queryParameters;
 
@@ -76,7 +76,7 @@ public class WebdavRequest {
         } else {
             _queryParameters = null;
         }
-        _resourceName = new WebdavResourceName(url, true);
+        _resourceName = new S3UrlNameImpl(url, true);
         _protocol = tokenizer.nextToken();
     }
 
@@ -92,7 +92,7 @@ public class WebdavRequest {
         return _startLine;
     }
 
-    public WebdavResourceName getResourceName() {
+    public S3UrlNameImpl getResourceName() {
         return _resourceName;
     }
 
@@ -192,7 +192,7 @@ public class WebdavRequest {
      *
      * @return
      */
-    public WebdavResourceName getDestination() {
+    public S3UrlNameImpl getDestination() {
         String destination = getHeader("Destination");
 
         _log.log("Destination header: (" + destination + ")");
@@ -222,7 +222,7 @@ public class WebdavRequest {
 
         destination = destination.substring(position);
 
-        return new WebdavResourceName(destination, true);
+        return new S3UrlNameImpl(destination, true);
     }
 
     public void parseParameters(HashMap parameters) throws IOException {

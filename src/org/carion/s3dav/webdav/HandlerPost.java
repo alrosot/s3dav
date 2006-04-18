@@ -17,9 +17,9 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.webdav.htmlPages.AdminPage;
 
 /**
@@ -29,7 +29,7 @@ import org.carion.s3dav.webdav.htmlPages.AdminPage;
  *
  */
 public class HandlerPost extends HandlerBase {
-    HandlerPost(WebdavRepository repository) {
+    HandlerPost(S3Repository repository) {
         super(repository);
     }
 

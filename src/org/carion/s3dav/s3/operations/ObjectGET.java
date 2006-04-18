@@ -18,8 +18,8 @@ package org.carion.s3dav.s3.operations;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
-import org.carion.s3dav.s3.Credential;
 
 /**
  * You fetch objects from S3 using the GET operation.

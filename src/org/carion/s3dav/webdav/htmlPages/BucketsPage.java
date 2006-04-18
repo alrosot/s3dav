@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.carion.s3dav.s3.Bucket;
+import org.carion.s3.impl.Bucket;
 
 class BucketsPage extends Page {
     private String _errorMessage;

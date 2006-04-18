@@ -17,7 +17,7 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
+import org.carion.s3.S3Repository;
 
 /**
  * Handles forbidden request
@@ -25,7 +25,7 @@ import org.carion.s3.WebdavRepository;
  * @author pcarion
  */
 public class HandlerForbidden extends HandlerBase {
-    HandlerForbidden(WebdavRepository repository) {
+    HandlerForbidden(S3Repository repository) {
         super(repository);
     }
 

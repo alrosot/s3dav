@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
-import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.util.Util;
 
 abstract public class BaseS3Operation implements S3Processing {
     private final Credential _credential;

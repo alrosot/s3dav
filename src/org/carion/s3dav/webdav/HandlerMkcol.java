@@ -17,8 +17,8 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3UrlName;
 
 /**
  * Handles 'MKCOL' request
@@ -52,7 +52,7 @@ import org.carion.s3dav.s3.naming.S3UrlName;
  * @author pcarion
  */
 public class HandlerMkcol extends HandlerBase {
-    HandlerMkcol(WebdavRepository repository) {
+    HandlerMkcol(S3Repository repository) {
         super(repository);
     }
 

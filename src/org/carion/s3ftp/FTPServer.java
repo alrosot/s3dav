@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.carion.s3.S3Log;
-import org.carion.s3dav.log.S3LogImpl;
+import org.carion.s3.util.S3LogImpl;
 
 public class FTPServer extends Thread {
     private final S3Log _log;

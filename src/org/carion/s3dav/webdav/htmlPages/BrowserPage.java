@@ -18,20 +18,20 @@ package org.carion.s3dav.webdav.htmlPages;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.carion.s3.WebdavFolder;
-import org.carion.s3.WebdavObject;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3.WebdavResource;
+import org.carion.s3.S3Folder;
+import org.carion.s3.S3Object;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.util.Util;
 import org.carion.s3dav.webdav.WebdavRequest;
 
 public class BrowserPage {
     private final HtmlWriter _w = new HtmlWriter();
 
-    public String getFolderHtmlPage(WebdavFolder folder, WebdavRequest request,
-            WebdavRepository repository) throws IOException {
+    public String getFolderHtmlPage(S3Folder folder, WebdavRequest request,
+            S3Repository repository) throws IOException {
         String theUri = folder.getUrl().getUri();
         _w.header("Directory:" + theUri);
         _w.h1("s3DAV version:" + Version.VERSION);
@@ -76,7 +76,7 @@ public class BrowserPage {
             S3UrlName uri = files[i];
             if (repository.isFolder(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
-                WebdavFolder res = repository.getFolder(uri);
+                S3Folder res = repository.getFolder(uri);
                 _w.out("<tr>");
                 _w.out("<td class=\"" + className + "\"><a href=\""
                         + mkUrl(res, request) + "\">"
@@ -92,7 +92,7 @@ public class BrowserPage {
             S3UrlName uri = files[i];
             if (repository.isResource(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
-                WebdavResource res = repository.getResource(uri);
+                S3Resource res = repository.getResource(uri);
                 _w.out("<tr><td class=\"" + className + "\"><a href=\""
                         + mkUrl(res, request) + "\">"
                         + Util.urlDecode(res.getName())
@@ -113,7 +113,7 @@ public class BrowserPage {
         return _w.toString();
     }
 
-    private String mkUrl(WebdavObject res, WebdavRequest request) {
+    private String mkUrl(S3Object res, WebdavRequest request) {
         return "http://" + request.getHost() + res.getUrl().getUri();
     }
 

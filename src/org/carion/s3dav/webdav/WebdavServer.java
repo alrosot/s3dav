@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.carion.s3.S3Log;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.S3Repository;
+import org.carion.s3.util.Util;
 
 /**
  * Implements a (partial) webdav compliant server.
@@ -51,7 +51,7 @@ public class WebdavServer extends Thread {
 
     private final int _port;
 
-    private final WebdavRepository _repository;
+    private final S3Repository _repository;
 
     private final Map _handlers = new HashMap();
 
@@ -59,7 +59,7 @@ public class WebdavServer extends Thread {
 
     private boolean _repositoryAvailable;
 
-    public WebdavServer(int port, WebdavRepository repository, S3Log log) {
+    public WebdavServer(int port, S3Repository repository, S3Log log) {
         _log = log;
         _port = port;
         _repository = repository;
