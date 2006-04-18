@@ -18,7 +18,7 @@ package org.carion.s3.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.carion.s3dav.s3.operations.ObjectHEAD;
+import org.carion.s3.operations.ObjectHEAD;
 
 /**
  * A LRU cache using a LinkedHashMap

@@ -26,15 +26,15 @@ import org.carion.s3.S3Folder;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.operations.BucketDELETE;
+import org.carion.s3.operations.BucketGET;
+import org.carion.s3.operations.BucketPUT;
+import org.carion.s3.operations.ObjectDELETE;
+import org.carion.s3.operations.ObjectGET;
+import org.carion.s3.operations.ObjectHEAD;
+import org.carion.s3.operations.ObjectPUT;
+import org.carion.s3.operations.ServiceGET;
 import org.carion.s3.util.Util;
-import org.carion.s3dav.s3.operations.BucketDELETE;
-import org.carion.s3dav.s3.operations.BucketGET;
-import org.carion.s3dav.s3.operations.BucketPUT;
-import org.carion.s3dav.s3.operations.ObjectDELETE;
-import org.carion.s3dav.s3.operations.ObjectGET;
-import org.carion.s3dav.s3.operations.ObjectHEAD;
-import org.carion.s3dav.s3.operations.ObjectPUT;
-import org.carion.s3dav.s3.operations.ServiceGET;
 
 /*
 
