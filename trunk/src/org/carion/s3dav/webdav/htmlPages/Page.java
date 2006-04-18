@@ -16,7 +16,7 @@
 package org.carion.s3dav.webdav.htmlPages;
 
 import org.carion.s3.S3Log;
-import org.carion.s3dav.s3.WebdavRepositoryImpl;
+import org.carion.s3.impl.S3RepositoryImpl;
 
 abstract class Page {
     private final String _pageTitle;
@@ -27,7 +27,7 @@ abstract class Page {
 
     private AdminPage _adminPage;
 
-    protected WebdavRepositoryImpl _repository;
+    protected S3RepositoryImpl _repository;
 
     protected S3Log _log;
 
@@ -37,7 +37,7 @@ abstract class Page {
     }
 
     void setContext(HtmlWriter w, AdminPage adminPage,
-            WebdavRepositoryImpl repository) {
+            S3RepositoryImpl repository) {
         _w = w;
         _adminPage = adminPage;
         _repository = repository;

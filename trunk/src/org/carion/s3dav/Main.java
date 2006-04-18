@@ -15,12 +15,12 @@
  */
 package org.carion.s3dav;
 
+import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3dav.log.S3LogImpl;
-import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.s3.CredentialFactory;
-import org.carion.s3dav.s3.WebdavRepositoryImpl;
+import org.carion.s3.S3Repository;
+import org.carion.s3.impl.CredentialFactory;
+import org.carion.s3.impl.S3RepositoryImpl;
+import org.carion.s3.util.S3LogImpl;
 import org.carion.s3dav.webdav.WebdavServer;
 
 public class Main {
@@ -32,7 +32,7 @@ public class Main {
             S3Log log = new S3LogImpl(System.out);
             log.log("s3DAV - version:" + Version.VERSION);
             Credential credential = CredentialFactory.getCredential();
-            WebdavRepository repository = new WebdavRepositoryImpl(credential,
+            S3Repository repository = new S3RepositoryImpl(credential,
                     log.getLogger(">s3>"));
             WebdavServer X = new WebdavServer(WEBDAVSERVER_PORT, repository,
                     log.getLogger(">dav>"));

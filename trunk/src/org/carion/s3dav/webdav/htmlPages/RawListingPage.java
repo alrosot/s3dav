@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.carion.s3dav.s3.Object;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.impl.Object;
+import org.carion.s3.util.Util;
 
 public class RawListingPage extends Page {
     RawListingPage(String pageName) {

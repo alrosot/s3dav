@@ -17,8 +17,8 @@ package org.carion.s3dav.s3.operations;
 
 import java.io.IOException;
 
+import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
-import org.carion.s3dav.s3.Credential;
 
 /**
  * The DELETE request operation deletes the bucket named in the URI.

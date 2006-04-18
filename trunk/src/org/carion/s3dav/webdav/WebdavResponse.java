@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.carion.s3dav.util.XMLWriter;
+import org.carion.s3.util.XMLWriter;
 
 /**
  * This class holds the information used to build the

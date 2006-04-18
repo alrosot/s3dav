@@ -17,9 +17,9 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
-import org.carion.s3.WebdavResource;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
 
 /**
  * Handles 'PUT' request
@@ -27,7 +27,7 @@ import org.carion.s3dav.s3.naming.S3UrlName;
  * @author pcarion
  */
 public class HandlerPut extends HandlerBase {
-    HandlerPut(WebdavRepository repository) {
+    HandlerPut(S3Repository repository) {
         super(repository);
     }
 
@@ -39,7 +39,7 @@ public class HandlerPut extends HandlerBase {
             if (_repository.isFolder(url)) {
                 response.setResponseStatus(WebdavResponse.SC_FORBIDDEN);
             } else {
-                WebdavResource res = _repository.getResource(url);
+                S3Resource res = _repository.getResource(url);
                 res.setResourceContent(request.getInputStream(), request
                         .getContentType(), request.getContentLength());
                 response.setResponseStatus(WebdavResponse.SC_CREATED);
@@ -52,7 +52,7 @@ public class HandlerPut extends HandlerBase {
                     return;
                 }
             }
-            WebdavResource res = _repository.createResource(url);
+            S3Resource res = _repository.createResource(url);
             res.setResourceContent(request.getInputStream(), request
                     .getContentType(), request.getContentLength());
             response.setResponseStatus(WebdavResponse.SC_CREATED);

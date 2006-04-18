@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.carion.s3.WebdavRepository;
+import org.carion.s3.S3Repository;
+import org.carion.s3.impl.S3RepositoryImpl;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.s3.WebdavRepositoryImpl;
 import org.carion.s3dav.webdav.WebdavRequest;
 
 /**
@@ -34,7 +34,7 @@ import org.carion.s3dav.webdav.WebdavRequest;
  *
  */
 public class AdminPage {
-    private final WebdavRepositoryImpl _repository;
+    private final S3RepositoryImpl _repository;
 
     private final WebdavRequest _request;
 
@@ -55,8 +55,8 @@ public class AdminPage {
         _pages.add(new DeleteObjectPage("deleteobject"));
     }
 
-    public AdminPage(WebdavRequest request, WebdavRepository repository) {
-        _repository = (WebdavRepositoryImpl) repository;
+    public AdminPage(WebdavRequest request, S3Repository repository) {
+        _repository = (S3RepositoryImpl) repository;
         _request = request;
         try {
             _request.parseParameters(_parameters);

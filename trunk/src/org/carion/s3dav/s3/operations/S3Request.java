@@ -37,11 +37,11 @@ import java.util.TreeMap;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.carion.s3.Credential;
+import org.carion.s3.util.Base64;
+import org.carion.s3.util.InputStreamObserver;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.s3.Credential;
-import org.carion.s3dav.util.Base64;
-import org.carion.s3dav.util.InputStreamObserver;
-import org.carion.s3dav.util.Util;
 
 public class S3Request {
     private static final String METADATA_PREFIX = "x-amz-meta-";

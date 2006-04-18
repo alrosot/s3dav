@@ -17,7 +17,7 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavRepository;
+import org.carion.s3.S3Repository;
 
 /**
  * Abstract class which defines the contract that any handler
@@ -26,9 +26,9 @@ import org.carion.s3.WebdavRepository;
  * @author pcarion
  */
 public abstract class HandlerBase {
-    protected final WebdavRepository _repository;
+    protected final S3Repository _repository;
 
-    protected HandlerBase(WebdavRepository repository) {
+    protected HandlerBase(S3Repository repository) {
         _repository = repository;
     }
 

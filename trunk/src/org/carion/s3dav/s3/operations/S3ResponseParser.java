@@ -18,8 +18,8 @@ package org.carion.s3dav.s3.operations;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.carion.s3dav.util.BaseXmlParser;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.util.BaseXmlParser;
+import org.carion.s3.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;

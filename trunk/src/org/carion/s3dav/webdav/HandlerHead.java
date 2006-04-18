@@ -17,14 +17,14 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavFolder;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3.WebdavResource;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.S3Folder;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.Util;
 
 public class HandlerHead extends HandlerGet {
-    HandlerHead(WebdavRepository repository) {
+    HandlerHead(S3Repository repository) {
         super(repository);
     }
 
@@ -37,7 +37,7 @@ public class HandlerHead extends HandlerGet {
             boolean isDirectory = _repository.isFolder(href);
 
             if (isDirectory) {
-                WebdavFolder folder = _repository.getFolder(href);
+                S3Folder folder = _repository.getFolder(href);
 
                 response.setResponseHeader("last-modified", Util.getHttpDate());
 
@@ -48,7 +48,7 @@ public class HandlerHead extends HandlerGet {
 
                 response.setResponseHeader("Content-Type", "text/html");
             } else {
-                WebdavResource resource = _repository.getResource(href);
+                S3Resource resource = _repository.getResource(href);
                 setHeaders(resource, response);
             }
         } else {

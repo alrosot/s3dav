@@ -17,12 +17,12 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.WebdavFolder;
-import org.carion.s3.WebdavObject;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3.WebdavResource;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.util.Util;
+import org.carion.s3.S3Folder;
+import org.carion.s3.S3Object;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.webdav.htmlPages.AdminPage;
 import org.carion.s3dav.webdav.htmlPages.BrowserPage;
 
@@ -44,7 +44,7 @@ import org.carion.s3dav.webdav.htmlPages.BrowserPage;
  *
  */
 public class HandlerGet extends HandlerBase {
-    HandlerGet(WebdavRepository repository) {
+    HandlerGet(S3Repository repository) {
         super(repository);
     }
 
@@ -66,10 +66,10 @@ public class HandlerGet extends HandlerBase {
                 boolean isDirectory = _repository.isFolder(href);
 
                 if (isDirectory) {
-                    WebdavFolder folder = _repository.getFolder(href);
+                    S3Folder folder = _repository.getFolder(href);
                     writeFolder(folder, response, request);
                 } else {
-                    WebdavResource resource = _repository.getResource(href);
+                    S3Resource resource = _repository.getResource(href);
                     setHeaders(resource, response);
                     response.setContentStream(resource.getContent());
                 }
@@ -89,7 +89,7 @@ public class HandlerGet extends HandlerBase {
      * @param response response to set
      * @throws IOException
      */
-    protected void setHeaders(WebdavResource resource, WebdavResponse response)
+    protected void setHeaders(S3Resource resource, WebdavResponse response)
             throws IOException {
         // set HTTP headers
         response.setResponseHeader("last-modified", Util.getHttpDate(resource
@@ -101,7 +101,7 @@ public class HandlerGet extends HandlerBase {
         response.setContentType(resource.getContentType());
     }
 
-    private void writeFolder(WebdavFolder folder, WebdavResponse response,
+    private void writeFolder(S3Folder folder, WebdavResponse response,
             WebdavRequest request) throws IOException {
         BrowserPage page = new BrowserPage();
         String body = page.getFolderHtmlPage(folder, request, _repository);
@@ -116,7 +116,7 @@ public class HandlerGet extends HandlerBase {
      * If you need an extra proof, that java generated
      * HTML code is ugly, here it is ...
      */
-    protected String getFolderHtmlPage(WebdavFolder folder,
+    protected String getFolderHtmlPage(S3Folder folder,
             WebdavRequest request) throws IOException {
         StringBuffer sb = new StringBuffer();
         sb.append("<html><header><title>List of files in:"
@@ -164,7 +164,7 @@ public class HandlerGet extends HandlerBase {
             S3UrlName uri = files[i];
             if (_repository.isFolder(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
-                WebdavFolder res = _repository.getFolder(uri);
+                S3Folder res = _repository.getFolder(uri);
                 sb.append("<tr><td class=\"" + className + "\"><a href=\""
                         + mkUrl(res, request) + "\">" + res.getName()
                         + "</a></td><td class=\"" + className
@@ -177,7 +177,7 @@ public class HandlerGet extends HandlerBase {
             S3UrlName uri = files[i];
             if (_repository.isResource(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
-                WebdavResource res = _repository.getResource(uri);
+                S3Resource res = _repository.getResource(uri);
                 sb.append("<tr><td class=\"" + className + "\"><a href=\""
                         + mkUrl(res, request) + "\">" + res.getName()
                         + "</a></td><td class=\"" + className
@@ -193,7 +193,7 @@ public class HandlerGet extends HandlerBase {
         return sb.toString();
     }
 
-    private String mkUrl(WebdavObject res, WebdavRequest request) {
+    private String mkUrl(S3Object res, WebdavRequest request) {
         return "http://" + request.getHost() + res.getUrl().getUri();
     }
 }

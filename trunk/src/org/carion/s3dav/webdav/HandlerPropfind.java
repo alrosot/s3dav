@@ -21,14 +21,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.carion.s3.WebdavFolder;
-import org.carion.s3.WebdavObject;
-import org.carion.s3.WebdavRepository;
-import org.carion.s3.WebdavResource;
-import org.carion.s3dav.s3.naming.S3UrlName;
-import org.carion.s3dav.util.BaseXmlParser;
-import org.carion.s3dav.util.Util;
-import org.carion.s3dav.util.XMLWriter;
+import org.carion.s3.S3Folder;
+import org.carion.s3.S3Object;
+import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.BaseXmlParser;
+import org.carion.s3.util.Util;
+import org.carion.s3.util.XMLWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,7 +56,7 @@ public class HandlerPropfind extends HandlerBase {
     private final static String[] FOLDER_PROPERTIES = { "creationdate",
             "displayName", "getlastmodified", "resourcetype" };
 
-    HandlerPropfind(WebdavRepository repository) {
+    HandlerPropfind(S3Repository repository) {
         super(repository);
     }
 
@@ -87,7 +87,7 @@ public class HandlerPropfind extends HandlerBase {
     private void process(XMLWriter writer, int depth, S3UrlName href)
             throws IOException {
         boolean isFolder = _repository.isFolder(href);
-        WebdavFolder folder = null;
+        S3Folder folder = null;
 
         writer.opening("response");
         writer.property("href", href.getUrlEncodedUri());
@@ -96,7 +96,7 @@ public class HandlerPropfind extends HandlerBase {
             folder = _repository.getFolder(href);
             writeResourceProperties(writer, folder);
         } else {
-            WebdavResource resource = _repository.getResource(href);
+            S3Resource resource = _repository.getResource(href);
             writeResourceProperties(writer, resource);
         }
         writer.closing("response");
@@ -110,17 +110,17 @@ public class HandlerPropfind extends HandlerBase {
         }
     }
 
-    private void writeResourceProperties(XMLWriter writer, WebdavObject object)
+    private void writeResourceProperties(XMLWriter writer, S3Object object)
             throws IOException {
-        WebdavResource resource = null;
-        WebdavFolder folder = null;
+        S3Resource resource = null;
+        S3Folder folder = null;
         String[] objectProperties;
 
-        if (object instanceof WebdavResource) {
-            resource = (WebdavResource) object;
+        if (object instanceof S3Resource) {
+            resource = (S3Resource) object;
             objectProperties = RESOURCE_PROPERTIES;
-        } else if (object instanceof WebdavFolder) {
-            folder = (WebdavFolder) object;
+        } else if (object instanceof S3Folder) {
+            folder = (S3Folder) object;
             objectProperties = FOLDER_PROPERTIES;
         } else {
             throw new IOException("internal error");
@@ -189,7 +189,7 @@ public class HandlerPropfind extends HandlerBase {
     }
 
     private boolean writeResourceProperty(XMLWriter writer,
-            String propertyName, WebdavResource resource) throws IOException {
+            String propertyName, S3Resource resource) throws IOException {
         String property = null;
         boolean useCdata = false;
         if ("creationdate".equals(propertyName)) {
@@ -223,7 +223,7 @@ public class HandlerPropfind extends HandlerBase {
     }
 
     private boolean writeResourceProperty(XMLWriter writer,
-            String propertyName, WebdavFolder folder) throws IOException {
+            String propertyName, S3Folder folder) throws IOException {
         String property = null;
         boolean useCdata = false;
         if ("creationdate".equals(propertyName)) {
