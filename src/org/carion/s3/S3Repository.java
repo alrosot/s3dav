@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.carion.s3dav.s3.naming.S3UrlName;
 
-public interface WebdavRepository {
+public interface S3Repository {
     boolean isAvailable();
 
     S3Log getLog();
@@ -34,13 +34,13 @@ public interface WebdavRepository {
 
     //String getParentUri(S3UrlName resource) throws IOException;
 
-    WebdavFolder createFolder(S3UrlName resource) throws IOException;
+    S3Folder createFolder(S3UrlName resource) throws IOException;
 
-    WebdavResource createResource(S3UrlName resource) throws IOException;
+    S3Resource createResource(S3UrlName resource) throws IOException;
 
-    WebdavFolder getFolder(S3UrlName resource) throws IOException;
+    S3Folder getFolder(S3UrlName resource) throws IOException;
 
-    WebdavResource getResource(S3UrlName resource) throws IOException;
+    S3Resource getResource(S3UrlName resource) throws IOException;
 
     void copy(S3UrlName source, S3UrlName destination) throws IOException;
 }
