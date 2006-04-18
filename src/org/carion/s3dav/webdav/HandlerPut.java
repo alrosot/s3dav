@@ -17,8 +17,8 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3dav.repository.WebdavRepository;
-import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3.WebdavRepository;
+import org.carion.s3.WebdavResource;
 import org.carion.s3dav.s3.naming.S3UrlName;
 
 /**

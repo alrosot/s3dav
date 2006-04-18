@@ -20,10 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.carion.s3dav.repository.S3Log;
-import org.carion.s3dav.repository.WebdavFolder;
-import org.carion.s3dav.repository.WebdavRepository;
-import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3.S3Log;
+import org.carion.s3.WebdavFolder;
+import org.carion.s3.WebdavRepository;
+import org.carion.s3.WebdavResource;
 import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.s3.operations.BucketDELETE;
 import org.carion.s3dav.s3.operations.BucketGET;

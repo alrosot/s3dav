@@ -1,4 +1,4 @@
-package org.carion.s3dav.repository;
+package org.carion.s3;
 
 public interface S3Log {
     void log(String message);

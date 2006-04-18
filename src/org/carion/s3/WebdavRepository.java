@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.carion.s3dav.repository;
+package org.carion.s3;
 
 import java.io.IOException;
 

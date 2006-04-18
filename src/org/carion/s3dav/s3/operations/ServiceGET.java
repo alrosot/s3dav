@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.carion.s3dav.repository.S3Log;
+import org.carion.s3.S3Log;
 import org.carion.s3dav.s3.Bucket;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.util.BaseXmlParser;

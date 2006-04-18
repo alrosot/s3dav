@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.carion.s3dav.repository.S3Log;
+import org.carion.s3.S3Log;
 import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
 import org.carion.s3dav.util.Util;

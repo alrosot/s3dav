@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.carion.s3.WebdavRepository;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.s3.WebdavRepositoryImpl;
 import org.carion.s3dav.webdav.WebdavRequest;
 
