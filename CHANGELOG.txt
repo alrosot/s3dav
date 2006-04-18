@@ -1,4 +1,6 @@
 ## Changelog
+### Release 0.6
+
 * FIX: change the InputStream management.
   s3DAV has now been tested with DAV Explorer
   (http://www.ics.uci.edu/~webdav/download.html).
@@ -20,6 +22,7 @@
   does not exist. This will fix the problem if you move a directory
   isnide your s3 file system from Windows explorer.
 
+### Release 0.5 (not uploaded under sourceforge)
 * FIX: log files were not rotating properly.
 
 ### Release 0.4
