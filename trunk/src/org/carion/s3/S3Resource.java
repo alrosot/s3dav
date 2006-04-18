@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 
-public interface WebdavResource extends WebdavObject {
+public interface S3Resource extends S3Object {
     String getContentType();
 
     long getLength() throws IOException;
