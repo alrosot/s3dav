@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3dav.s3.naming.S3UrlName;
 
 public class HandlerOptions extends HandlerBase {
     HandlerOptions(WebdavRepository repository) {
@@ -26,7 +27,7 @@ public class HandlerOptions extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String href = request.getUrl();
+        S3UrlName href = request.getUrl();
         StringBuffer options = new StringBuffer();
         response.setResponseHeader("DAV", "1, 2");
 

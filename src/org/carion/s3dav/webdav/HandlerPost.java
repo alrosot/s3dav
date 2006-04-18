@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.util.Util;
 import org.carion.s3dav.webdav.htmlPages.AdminPage;
 
@@ -34,10 +35,10 @@ public class HandlerPost extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String href = request.getUrl();
+        S3UrlName href = request.getUrl();
 
         // catch request to admin pages
-        if (href.startsWith("/index.html")) {
+        if (href.getUri().startsWith("/index.html")) {
             AdminPage page = new AdminPage(request, _repository);
             String body = page.getHtmlPage();
 

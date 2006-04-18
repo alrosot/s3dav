@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
 
 /**
  * Handles 'COPY' request.
@@ -32,7 +33,7 @@ public class HandlerCopy extends HandlerBase {
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
         boolean overwrite = request.getOverwrite();
-        String destination = request.getDestination();
+        WebdavResourceName destination = request.getDestination();
 
         if (destination == null) {
             response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
@@ -47,7 +48,7 @@ public class HandlerCopy extends HandlerBase {
                 return;
             }
         }
-        _repository.copy(request.getUrl(), destination);
+        _repository.copy(request.getResourceName(), destination);
 
         response.setResponseStatus(WebdavResponse.SC_CREATED);
     }

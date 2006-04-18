@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.carion.s3dav.log.S3Log;
+import org.carion.s3dav.repository.S3Log;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.s3.Object;
 import org.carion.s3dav.util.BaseXmlParser;
@@ -58,7 +58,7 @@ public class BucketGET extends BaseS3Operation {
         for (String marker = null;;) {
             S3Request X = S3Request.mkGetRequest("/" + _bucket);
             X.setQueryString("prefix="
-                    + Util.urlEncode(prefix)
+                    + prefix
                     + ((marker == null) ? "" : "&marker="
                             + Util.urlEncode(marker)));
             if (!process(X, false)) {

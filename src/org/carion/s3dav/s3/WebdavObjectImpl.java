@@ -19,34 +19,39 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.carion.s3dav.repository.WebdavObject;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 
 public abstract class WebdavObjectImpl implements WebdavObject {
-    protected final S3ResourceName _name;
+    protected final S3UrlName _name;
 
-    protected final String _s3Uri;
+    protected final String _s3Key;
 
-    protected Credential _credential;
+    protected final Credential _credential;
 
     protected final WebdavRepositoryImpl _repository;
 
-    WebdavObjectImpl(String uri, Credential credential,
-            WebdavRepositoryImpl repository) {
-        this(new S3ResourceName(uri), credential, repository);
-    }
+    //    WebdavObjectImpl(String uri, Credential credential,
+    //            WebdavRepositoryImpl repository) {
+    //        this(new S3ResourceName(uri), credential, repository);
+    //    }
 
-    WebdavObjectImpl(S3ResourceName name, Credential credential,
+    WebdavObjectImpl(S3UrlName name, Credential credential,
             WebdavRepositoryImpl repository) {
         _name = name;
         _credential = credential;
         _repository = repository;
         if (_name.isRoot()) {
-            _s3Uri = "/";
+            _s3Key = "/";
         } else if (_name.isBucket()) {
-            _s3Uri = _name.getUri();
+            _s3Key = _name.getUri();
         } else {
-            _s3Uri = _name.getResourceKey();
+            _s3Key = _name.getResourceKey();
         }
+    }
+
+    public S3UrlName getUrl() {
+        return _name;
     }
 
     public Date getCreationDate() throws IOException {
@@ -62,10 +67,9 @@ public abstract class WebdavObjectImpl implements WebdavObject {
             // TODO
             return new Date();
         } else {
-            String key = _name.getResourceKey();
-            ObjectHEAD ope = _repository.mkObjectHEAD(key);
+            ObjectHEAD ope = _repository.mkObjectHEAD(_s3Key);
             if (!ope.execute()) {
-                throw new IOException("Can't get info for:" + key);
+                throw new IOException("Can't get info for:" + _s3Key);
             }
             return ope.getLastModifiedDate();
         }
@@ -75,7 +79,7 @@ public abstract class WebdavObjectImpl implements WebdavObject {
         return _name.getName();
     }
 
-    public String getURI() {
-        return _name.getUri();
-    }
+    //    public String getURI() {
+    //        return _name.getUri();
+    //    }
 }

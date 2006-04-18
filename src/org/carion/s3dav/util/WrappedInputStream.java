@@ -9,6 +9,7 @@ public class WrappedInputStream extends InputStream {
     private boolean _closed = false;
 
     private final boolean _keepAlive;
+
     /**
      * Wrapped input stream that all calls are delegated to.
      */
@@ -16,7 +17,8 @@ public class WrappedInputStream extends InputStream {
 
     private final InputStreamObserver _observer;
 
-    WrappedInputStream(InputStream in, boolean keepAlive, InputStreamObserver observer) {
+    WrappedInputStream(InputStream in, boolean keepAlive,
+            InputStreamObserver observer) {
         if (in == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
@@ -47,7 +49,9 @@ public class WrappedInputStream extends InputStream {
         if (_closed) {
             throw new IOException("Attempted read from closed stream.");
         }
-        return _in.read();
+        int ret = _in.read();
+        System.out.print("<" + (char) ret + ">");
+        return ret;
     }
 
     public int read(byte[] b, int off, int len) throws java.io.IOException {
@@ -58,6 +62,9 @@ public class WrappedInputStream extends InputStream {
     }
 
     public int read(byte[] b) throws IOException {
+        if (_closed) {
+            throw new IOException("Attempted read from closed stream.");
+        }
         return _in.read(b);
     }
 

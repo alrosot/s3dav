@@ -129,6 +129,7 @@ public class WebdavResponse {
             setContentType("text/xml;charser=utf-8");
             _xmlWriter.finish();
             String data = _xmlWriter.getData();
+
             setResponseHeader("Content-Length", String.valueOf(data.length()));
             _content = new ByteArrayInputStream(data.getBytes());
         } else if (_responseBody != null) {

@@ -34,6 +34,15 @@ public class Object {
         return _key;
     }
 
+    // that's the name without the prefix
+    public String getName() {
+        int pos = _key.lastIndexOf("/");
+        if (pos < 0) {
+            throw new RuntimeException("bad key name for object:"+_key);
+        }
+        return _key.substring(pos+1);
+    }
+
     public Date getLastModified() {
         return _lastModified;
     }

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.carion.s3dav.log.S3Log;
+import org.carion.s3dav.repository.S3Log;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.util.Util;
 
@@ -137,8 +137,9 @@ abstract public class BaseS3Operation implements S3Processing {
      * @return
      * @throws IOException
      */
-    protected String getXmldata() throws IOException{
+    protected String getXmldata() throws IOException {
         String xmlData = Util.readInputStreamAsString(_inputStream);
+        _log.log("xmlData is:(" + xmlData + ")");
         _inputStream.close();
         return xmlData;
     }

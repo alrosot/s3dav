@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3dav.s3.naming.S3UrlName;
 
 /**
  * Handles 'DELETE' request
@@ -31,7 +32,7 @@ public class HandlerDelete extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String url = request.getUrl();
+        S3UrlName url = request.getUrl();
 
         if (_repository.objectExists(url)) {
             _repository.deleteObject(url);

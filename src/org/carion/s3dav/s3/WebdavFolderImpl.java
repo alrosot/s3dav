@@ -21,61 +21,52 @@ import java.util.List;
 
 import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
 import org.carion.s3dav.s3.operations.BucketGET;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
 
 public class WebdavFolderImpl extends WebdavObjectImpl implements WebdavFolder {
-    WebdavFolderImpl(String uri, Credential credential,
+    WebdavFolderImpl(S3UrlName uri, Credential credential,
             WebdavRepositoryImpl repository) {
         super(uri, credential, repository);
     }
 
-    WebdavFolderImpl(S3ResourceName name, Credential credential,
-            WebdavRepositoryImpl repository) {
-        super(name, credential, repository);
-    }
-
     public WebdavFolder createFolder(String name) throws IOException {
-        return _repository.createFolder(_name.getUri() + "/" + name);
+        return _repository.createFolder(_name.getChild(name));
     }
 
     public WebdavResource createResource(String name) throws IOException {
-        return _repository.createResource(_name.getUri() + "/" + name);
+        return _repository.createResource(_name.getChild(name));
     }
 
-    public String[] getChildrenUris() throws IOException {
-        String[] result;
+    public S3UrlName[] getChildrenUris() throws IOException {
+        S3UrlName[] result;
 
         if (_name.isRoot()) {
             // we want the buckets here
             List buckets = _repository.getBuckets();
-            result = new String[buckets.size()];
+            result = new S3UrlName[buckets.size()];
             int index = 0;
             for (Iterator iter = buckets.iterator(); iter.hasNext();) {
                 Bucket bucket = (Bucket) iter.next();
-                result[index++] = "/" + bucket.getName();
+                result[index++] = new WebdavResourceName(
+                        "/" + bucket.getName(), false);
             }
-            //result[index] = "/New Bucket";
         } else {
             // we want the resources inside a directory
             String bucket = _name.getBucket();
-            String prefix;
-            if (_name.isBucket()) {
-                prefix = "/";
-            } else {
-                prefix = _name.getUriWithoutBucket() + "//";
-            }
+            String prefix = _name.getPrefixKey();
             BucketGET ope = new BucketGET(bucket, _credential, _repository
                     .getLog());
 
             List objects = ope.execute(prefix);
-            result = new String[objects.size()];
+            result = new S3UrlName[objects.size()];
 
             int count = 0;
             for (Iterator iter = objects.iterator(); iter.hasNext();) {
                 Object obj = (Object) iter.next();
-                result[count++] = _name.getUri() + "/"
-                        + obj.getKey().substring(prefix.length());
+                result[count++] = _name.getChild(obj.getName());
             }
         }
         return result;
@@ -91,10 +82,10 @@ public class WebdavFolderImpl extends WebdavObjectImpl implements WebdavFolder {
     }
 
     private void deleteFolderContent(WebdavFolder folder) throws IOException {
-        String[] files = folder.getChildrenUris();
+        S3UrlName[] files = folder.getChildrenUris();
 
         for (int i = 0; i < files.length; i++) {
-            String uri = files[i];
+            S3UrlName uri = files[i];
 
             if (_repository.isFolder(uri)) {
                 deleteFolder(_repository.getFolder(uri));
