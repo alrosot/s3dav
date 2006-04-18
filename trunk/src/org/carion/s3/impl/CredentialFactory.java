@@ -3,7 +3,7 @@ package org.carion.s3.impl;
 import java.security.KeyStoreException;
 
 import org.carion.s3.Credential;
-import org.carion.s3dav.s3.keymanagement.CredentialImpl;
+import org.carion.s3.keymanagement.CredentialImpl;
 
 public class CredentialFactory {
     public static Credential getCredential() {
