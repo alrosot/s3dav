@@ -20,20 +20,20 @@ import java.io.InputStream;
 
 import org.carion.s3.Credential;
 import org.carion.s3.S3Resource;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.MemoryMappedFile;
+import org.carion.s3.util.MimeTypes;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
 import org.carion.s3dav.s3.operations.ObjectGET;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 import org.carion.s3dav.s3.operations.ObjectPUT;
-import org.carion.s3dav.util.MemoryMappedFile;
-import org.carion.s3dav.util.MimeTypes;
-import org.carion.s3dav.util.Util;
 
-public class WebdavResourceImpl extends WebdavObjectImpl implements
+public class S3ResourceImpl extends S3ObjectImpl implements
         S3Resource {
 
-    WebdavResourceImpl(S3UrlName name, Credential credential,
-            WebdavRepositoryImpl repository) {
+    S3ResourceImpl(S3UrlName name, Credential credential,
+            S3RepositoryImpl repository) {
         super(name, credential, repository);
     }
 

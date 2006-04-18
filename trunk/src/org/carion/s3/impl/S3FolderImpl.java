@@ -22,14 +22,14 @@ import java.util.List;
 import org.carion.s3.Credential;
 import org.carion.s3.S3Folder;
 import org.carion.s3.S3Resource;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3UrlName;
 import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
 import org.carion.s3dav.s3.operations.BucketGET;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
 
-public class WebdavFolderImpl extends WebdavObjectImpl implements S3Folder {
-    WebdavFolderImpl(S3UrlName uri, Credential credential,
-            WebdavRepositoryImpl repository) {
+public class S3FolderImpl extends S3ObjectImpl implements S3Folder {
+    S3FolderImpl(S3UrlName uri, Credential credential,
+            S3RepositoryImpl repository) {
         super(uri, credential, repository);
     }
 
@@ -79,7 +79,7 @@ public class WebdavFolderImpl extends WebdavObjectImpl implements S3Folder {
 
     private void deleteFolder(S3Folder folder) throws IOException {
         deleteFolderContent(folder);
-        ((WebdavFolderImpl) folder).doRemove();
+        ((S3FolderImpl) folder).doRemove();
     }
 
     private void deleteFolderContent(S3Folder folder) throws IOException {

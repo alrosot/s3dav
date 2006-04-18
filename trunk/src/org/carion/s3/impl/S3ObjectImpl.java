@@ -20,25 +20,25 @@ import java.util.Date;
 
 import org.carion.s3.Credential;
 import org.carion.s3.S3Object;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3UrlName;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 
-public abstract class WebdavObjectImpl implements S3Object {
+public abstract class S3ObjectImpl implements S3Object {
     protected final S3UrlName _name;
 
     protected final String _s3Key;
 
     protected final Credential _credential;
 
-    protected final WebdavRepositoryImpl _repository;
+    protected final S3RepositoryImpl _repository;
 
     //    WebdavObjectImpl(String uri, Credential credential,
     //            WebdavRepositoryImpl repository) {
     //        this(new S3ResourceName(uri), credential, repository);
     //    }
 
-    WebdavObjectImpl(S3UrlName name, Credential credential,
-            WebdavRepositoryImpl repository) {
+    S3ObjectImpl(S3UrlName name, Credential credential,
+            S3RepositoryImpl repository) {
         _name = name;
         _credential = credential;
         _repository = repository;
