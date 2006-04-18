@@ -23,8 +23,8 @@ import org.carion.s3.Credential;
 import org.carion.s3.S3Folder;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
-import org.carion.s3dav.s3.operations.BucketGET;
-import org.carion.s3dav.s3.operations.ObjectDELETE;
+import org.carion.s3.operations.BucketGET;
+import org.carion.s3.operations.ObjectDELETE;
 
 public class S3FolderImpl extends S3ObjectImpl implements S3Folder {
     S3FolderImpl(S3UrlName uri, Credential credential,

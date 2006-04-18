@@ -21,7 +21,7 @@ import java.util.Date;
 import org.carion.s3.Credential;
 import org.carion.s3.S3Object;
 import org.carion.s3.S3UrlName;
-import org.carion.s3dav.s3.operations.ObjectHEAD;
+import org.carion.s3.operations.ObjectHEAD;
 
 public abstract class S3ObjectImpl implements S3Object {
     protected final S3UrlName _name;
