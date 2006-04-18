@@ -17,7 +17,7 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3.WebdavRepository;
 
 /**
  * Abstract class which defines the contract that any handler

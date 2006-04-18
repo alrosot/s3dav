@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.carion.s3dav.repository;
+package org.carion.s3;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.carion.s3dav.s3.naming.S3UrlName;
 
-public interface WebdavFolder extends WebdavObject {
-    WebdavFolder createFolder(String name) throws IOException;
+public interface WebdavObject {
+    S3UrlName getUrl();
 
-    WebdavResource createResource(String name) throws IOException;
+    String getName();
 
-    S3UrlName[] getChildrenUris() throws IOException;
+    Date getLastModified() throws IOException;
+
+    void remove() throws IOException;
+
+    Date getCreationDate() throws IOException;
 }

@@ -27,7 +27,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.carion.s3dav.repository.S3Log;
+import org.carion.s3.S3Log;
 
 public class S3LogImpl implements S3Log {
     private static final DateFormat DF = new SimpleDateFormat(

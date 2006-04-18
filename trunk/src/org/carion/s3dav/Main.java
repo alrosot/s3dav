@@ -15,9 +15,9 @@
  */
 package org.carion.s3dav;
 
+import org.carion.s3.S3Log;
+import org.carion.s3.WebdavRepository;
 import org.carion.s3dav.log.S3LogImpl;
-import org.carion.s3dav.repository.S3Log;
-import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.s3.CredentialFactory;
 import org.carion.s3dav.s3.WebdavRepositoryImpl;
@@ -25,6 +25,7 @@ import org.carion.s3dav.webdav.WebdavServer;
 
 public class Main {
     private final static int WEBDAVSERVER_PORT = 8070;
+    private final static int FTPSERVER_PORT = 8060;
 
     public static void main(String[] args) {
         try {
