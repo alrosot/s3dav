@@ -25,7 +25,8 @@ import org.carion.s3.S3Log;
 import org.carion.s3.S3Folder;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
-import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.util.Util;
 import org.carion.s3dav.s3.operations.BucketDELETE;
 import org.carion.s3dav.s3.operations.BucketGET;
 import org.carion.s3dav.s3.operations.BucketPUT;
@@ -34,7 +35,6 @@ import org.carion.s3dav.s3.operations.ObjectGET;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
 import org.carion.s3dav.s3.operations.ObjectPUT;
 import org.carion.s3dav.s3.operations.ServiceGET;
-import org.carion.s3dav.util.Util;
 
 /*
 
@@ -59,7 +59,7 @@ import org.carion.s3dav.util.Util;
  If we check the content of /a// , we get 2 items
 
  */
-public class WebdavRepositoryImpl implements S3Repository {
+public class S3RepositoryImpl implements S3Repository {
     private Credential _credential;
 
     private final S3Log _log;
@@ -68,7 +68,7 @@ public class WebdavRepositoryImpl implements S3Repository {
 
     private List _buckets = null;
 
-    public WebdavRepositoryImpl(Credential credential, S3Log log) {
+    public S3RepositoryImpl(Credential credential, S3Log log) {
         _credential = credential;
         _log = log;
         _s3ObjectCache = new Cache(32);
@@ -176,7 +176,7 @@ public class WebdavRepositoryImpl implements S3Repository {
             if (!ope.execute()) {
                 throw new IOException("can't create:" + uri.getUri());
             }
-            result = new WebdavFolderImpl(uri, _credential, this);
+            result = new S3FolderImpl(uri, _credential, this);
         } else {
             // that's a 'regular' directory
             ObjectPUT ope = mkObjectPUT(uri.getResourceKey());
@@ -184,7 +184,7 @@ public class WebdavRepositoryImpl implements S3Repository {
             if (!ope.execute()) {
                 throw new IOException("can't create:" + uri.getUri());
             }
-            result = new WebdavFolderImpl(uri, _credential, this);
+            result = new S3FolderImpl(uri, _credential, this);
         }
         return result;
     }
@@ -205,17 +205,17 @@ public class WebdavRepositoryImpl implements S3Repository {
         if (!ope.execute()) {
             throw new IOException("can't create:" + uri.getUri());
         }
-        result = new WebdavResourceImpl(uri, _credential, this);
+        result = new S3ResourceImpl(uri, _credential, this);
 
         return result;
     }
 
     public S3Folder getFolder(S3UrlName uri) throws IOException {
-        return new WebdavFolderImpl(uri, _credential, this);
+        return new S3FolderImpl(uri, _credential, this);
     }
 
     public S3Resource getResource(S3UrlName uri) throws IOException {
-        return new WebdavResourceImpl(uri, _credential, this);
+        return new S3ResourceImpl(uri, _credential, this);
     }
 
     private boolean isBucketName(String name) throws IOException {
