@@ -23,6 +23,7 @@ import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavObject;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.util.Util;
 import org.carion.s3dav.webdav.WebdavRequest;
 
@@ -31,7 +32,7 @@ public class BrowserPage {
 
     public String getFolderHtmlPage(WebdavFolder folder, WebdavRequest request,
             WebdavRepository repository) throws IOException {
-        String theUri = folder.getURI();
+        String theUri = folder.getUrl().getUri();
         _w.header("Directory:" + theUri);
         _w.h1("s3DAV version:" + Version.VERSION);
         _w.div("breadcrumb");
@@ -65,14 +66,14 @@ public class BrowserPage {
         _w.th("type");
         _w.out("</tr>");
 
-        String[] files = folder.getChildrenUris();
+        S3UrlName[] files = folder.getChildrenUris();
 
         int lineno = 0;
         String className;
 
         // pass #1: the directories
         for (int i = 0; i < files.length; i++) {
-            String uri = files[i];
+            S3UrlName uri = files[i];
             if (repository.isFolder(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavFolder res = repository.getFolder(uri);
@@ -88,7 +89,7 @@ public class BrowserPage {
             }
         }
         for (int i = 0; i < files.length; i++) {
-            String uri = files[i];
+            S3UrlName uri = files[i];
             if (repository.isResource(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavResource res = repository.getResource(uri);
@@ -113,7 +114,7 @@ public class BrowserPage {
     }
 
     private String mkUrl(WebdavObject res, WebdavRequest request) {
-        return "http://" + request.getHost() + res.getURI();
+        return "http://" + request.getHost() + res.getUrl().getUri();
     }
 
 }

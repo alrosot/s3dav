@@ -20,11 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.carion.s3dav.log.S3Log;
-import org.carion.s3dav.repository.BaseWebdavRespository;
-import org.carion.s3dav.repository.ResourceName;
+import org.carion.s3dav.repository.S3Log;
 import org.carion.s3dav.repository.WebdavFolder;
+import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.s3.operations.BucketDELETE;
 import org.carion.s3dav.s3.operations.BucketGET;
 import org.carion.s3dav.s3.operations.BucketPUT;
@@ -58,7 +58,7 @@ import org.carion.s3dav.util.Util;
  If we check the content of /a// , we get 2 items
 
  */
-public class WebdavRepositoryImpl extends BaseWebdavRespository {
+public class WebdavRepositoryImpl implements WebdavRepository {
     private Credential _credential;
 
     private final S3Log _log;
@@ -66,10 +66,6 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
     private final Cache _s3ObjectCache;
 
     private List _buckets = null;
-
-    private long _bucketsTimeStamp = 0;
-
-    private final static long REFRESH_BUCKETS_DELAY = 10000L;
 
     public WebdavRepositoryImpl(Credential credential, S3Log log) {
         _credential = credential;
@@ -109,41 +105,39 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
         return (key != null) ? key : "";
     }
 
-    public void deleteObject(String uri) throws IOException {
-        if (isFolder(uri)) {
-            WebdavFolder folder = getFolder(uri);
+    public void deleteObject(S3UrlName resource) throws IOException {
+        if (isFolder(resource)) {
+            WebdavFolder folder = getFolder(resource);
             folder.remove();
         } else {
-            WebdavResource res = getResource(uri);
+            WebdavResource res = getResource(resource);
             res.remove();
         }
     }
 
-    public boolean objectExists(String uri) throws IOException {
-        S3ResourceName name = new S3ResourceName(uri);
+    public boolean objectExists(S3UrlName resource) throws IOException {
         boolean result;
-        if (name.isRoot()) {
+        if (resource.isRoot()) {
             result = true;
-        } else if (name.isBucket()) {
-            result = isBucketName(name.getName());
+        } else if (resource.isBucket()) {
+            result = isBucketName(resource.getName());
         } else {
             // that's a regular resource
-            ObjectHEAD ope = mkObjectHEAD(name.getResourceKey());
+            ObjectHEAD ope = mkObjectHEAD(resource.getResourceKey());
 
             result = ope.execute();
         }
         return result;
     }
 
-    public boolean isFolder(String uri) throws IOException {
+    public boolean isFolder(S3UrlName resource) throws IOException {
         boolean result;
-        S3ResourceName name = new S3ResourceName(uri);
-        if (name.isRoot()) {
+        if (resource.isRoot()) {
             result = true;
-        } else if (name.isBucket()) {
-            result = isBucketName(name.getName());
+        } else if (resource.isBucket()) {
+            result = isBucketName(resource.getName());
         } else {
-            ObjectHEAD ope = mkObjectHEAD(name.getResourceKey());
+            ObjectHEAD ope = mkObjectHEAD(resource.getResourceKey());
             boolean res = ope.execute();
             if (res) {
                 result = ope.getMeta("dir") != null;
@@ -154,15 +148,14 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
         return result;
     }
 
-    public boolean isResource(String uri) throws IOException {
+    public boolean isResource(S3UrlName uri) throws IOException {
         boolean result;
-        S3ResourceName name = new S3ResourceName(uri);
-        if (name.isRoot()) {
+        if (uri.isRoot()) {
             result = false;
-        } else if (name.isBucket()) {
+        } else if (uri.isBucket()) {
             result = false;
         } else {
-            ObjectHEAD ope = mkObjectHEAD(name.getResourceKey());
+            ObjectHEAD ope = mkObjectHEAD(uri.getResourceKey());
             boolean res = ope.execute();
             if (res) {
                 result = ope.getMeta("dir") == null;
@@ -173,56 +166,54 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
         return result;
     }
 
-    public WebdavFolder createFolder(String uri) throws IOException {
+    public WebdavFolder createFolder(S3UrlName uri) throws IOException {
         WebdavFolder result;
-        S3ResourceName name = new S3ResourceName(uri);
-        if (name.isRoot()) {
+        if (uri.isRoot()) {
             throw new IOException("Can't create /");
-        } else if (name.isBucket()) {
-            BucketPUT ope = new BucketPUT(name.getName(), _credential, getLog());
+        } else if (uri.isBucket()) {
+            BucketPUT ope = new BucketPUT(uri.getName(), _credential, getLog());
             if (!ope.execute()) {
-                throw new IOException("can't create:" + name.getUri());
+                throw new IOException("can't create:" + uri.getUri());
             }
-            result = new WebdavFolderImpl(name, _credential, this);
+            result = new WebdavFolderImpl(uri, _credential, this);
         } else {
             // that's a 'regular' directory
-            ObjectPUT ope = mkObjectPUT(name.getResourceKey());
+            ObjectPUT ope = mkObjectPUT(uri.getResourceKey());
             ope.addMeta("dir", "true");
             if (!ope.execute()) {
-                throw new IOException("can't create:" + name.getUri());
+                throw new IOException("can't create:" + uri.getUri());
             }
-            result = new WebdavFolderImpl(name, _credential, this);
+            result = new WebdavFolderImpl(uri, _credential, this);
         }
         return result;
     }
 
-    public WebdavResource createResource(String uri) throws IOException {
+    public WebdavResource createResource(S3UrlName uri) throws IOException {
         WebdavResource result;
-        S3ResourceName name = new S3ResourceName(uri);
-        if (name.isRoot()) {
+        if (uri.isRoot()) {
             throw new IOException("Can't create /");
         }
 
-        if (name.isBucket()) {
+        if (uri.isBucket()) {
             // OK, we want to create a bucket here
             // bucket are always directories
-            throw new IOException("can't create file in /:" + name.getUri());
+            throw new IOException("can't create file in /:" + uri.getUri());
         }
 
-        ObjectPUT ope = mkObjectPUT(name.getResourceKey());
+        ObjectPUT ope = mkObjectPUT(uri.getResourceKey());
         if (!ope.execute()) {
-            throw new IOException("can't create:" + name.getUri());
+            throw new IOException("can't create:" + uri.getUri());
         }
-        result = new WebdavResourceImpl(name, _credential, this);
+        result = new WebdavResourceImpl(uri, _credential, this);
 
         return result;
     }
 
-    public WebdavFolder getFolder(String uri) throws IOException {
+    public WebdavFolder getFolder(S3UrlName uri) throws IOException {
         return new WebdavFolderImpl(uri, _credential, this);
     }
 
-    public WebdavResource getResource(String uri) throws IOException {
+    public WebdavResource getResource(S3UrlName uri) throws IOException {
         return new WebdavResourceImpl(uri, _credential, this);
     }
 
@@ -279,7 +270,7 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
     }
 
     public ObjectHEAD mkObjectHEAD(String uri) {
-        ObjectHEAD result = null; //_s3ObjectCache.get(uri);
+        ObjectHEAD result = _s3ObjectCache.get(uri);
         if (result == null) {
             result = new ObjectHEAD(uri, _credential, _log);
             _s3ObjectCache.put(uri, result);
@@ -321,6 +312,56 @@ public class WebdavRepositoryImpl extends BaseWebdavRespository {
         if (!ope.execute()) {
             throw new IOException("Can't delete object:" + uri.toString());
         }
+    }
+
+    //    public String getParentUri(String uri) throws IOException {
+    // when trying to get the parent URI, we consider that the
+    // following URI is already encoded, so no need to
+    // reencode the parent URI
+    //        ResourceName name = new ResourceName(uri, false);
+    //        return name.getParentUri();
+    //    }
+
+    public void copy(S3UrlName source, S3UrlName destination)
+            throws IOException {
+        if (isFolder(source)) {
+            WebdavFolder src = getFolder(source);
+            WebdavFolder dest = createFolder(destination);
+            copyDirectory(src, dest);
+        } else {
+            WebdavResource src = getResource(source);
+            WebdavResource dest = createResource(destination);
+            copyResource(src, dest);
+        }
+    }
+
+    private void copyDirectory(WebdavFolder src, WebdavFolder dest)
+            throws IOException {
+        S3UrlName[] children = src.getChildrenUris();
+
+        _log.log("Copy directory from: (" + src.getUrl().getUri() + ") to ("
+                + dest.getUrl().getUri() + ")");
+
+        for (int i = 0; i < children.length; i++) {
+            S3UrlName uri = children[i];
+            if (isFolder(uri)) {
+                WebdavFolder s = getFolder(uri);
+                WebdavFolder d = dest.createFolder(s.getName());
+                copyDirectory(s, d);
+            } else {
+                WebdavResource s = getResource(uri);
+                WebdavResource d = dest.createResource(s.getName());
+                copyResource(s, d);
+            }
+        }
+    }
+
+    private void copyResource(WebdavResource src, WebdavResource dest)
+            throws IOException {
+        _log.log("Copy resource from: (" + src.getUrl().getUri() + ") to ("
+                + dest.getUrl().getUri() + ")");
+        dest.setResourceContent(src.getContent(), src.getContentType(), src
+                .getLength());
     }
 
 }

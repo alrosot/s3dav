@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.s3.operations.ObjectDELETE;
 import org.carion.s3dav.s3.operations.ObjectGET;
 import org.carion.s3dav.s3.operations.ObjectHEAD;
@@ -29,12 +30,8 @@ import org.carion.s3dav.util.Util;
 
 public class WebdavResourceImpl extends WebdavObjectImpl implements
         WebdavResource {
-    WebdavResourceImpl(String uri, Credential credential,
-            WebdavRepositoryImpl repository) {
-        super(uri, credential, repository);
-    }
 
-    WebdavResourceImpl(S3ResourceName name, Credential credential,
+    WebdavResourceImpl(S3UrlName name, Credential credential,
             WebdavRepositoryImpl repository) {
         super(name, credential, repository);
     }

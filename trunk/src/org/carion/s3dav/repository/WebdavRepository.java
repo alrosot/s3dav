@@ -17,26 +17,30 @@ package org.carion.s3dav.repository;
 
 import java.io.IOException;
 
+import org.carion.s3dav.s3.naming.S3UrlName;
+
 public interface WebdavRepository {
     boolean isAvailable();
 
-    void deleteObject(String uri) throws IOException;
+    S3Log getLog();
 
-    boolean objectExists(String uri) throws IOException;
+    void deleteObject(S3UrlName resource) throws IOException;
 
-    boolean isFolder(String uri) throws IOException;
+    boolean objectExists(S3UrlName resource) throws IOException;
 
-    boolean isResource(String uri) throws IOException;
+    boolean isFolder(S3UrlName resource) throws IOException;
 
-    String getParentUri(String uri) throws IOException;
+    boolean isResource(S3UrlName resource) throws IOException;
 
-    WebdavFolder createFolder(String uri) throws IOException;
+    //String getParentUri(S3UrlName resource) throws IOException;
 
-    WebdavResource createResource(String uri) throws IOException;
+    WebdavFolder createFolder(S3UrlName resource) throws IOException;
 
-    WebdavFolder getFolder(String uri) throws IOException;
+    WebdavResource createResource(S3UrlName resource) throws IOException;
 
-    WebdavResource getResource(String uri) throws IOException;
+    WebdavFolder getFolder(S3UrlName resource) throws IOException;
 
-    void copy(String uriSource, String uriDestination) throws IOException;
+    WebdavResource getResource(S3UrlName resource) throws IOException;
+
+    void copy(S3UrlName source, S3UrlName destination) throws IOException;
 }

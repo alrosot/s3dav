@@ -31,6 +31,10 @@ public class MimeTypes {
         _mimeTypes.put("html", "text/html");
         _mimeTypes.put("htm", "text/html");
         _mimeTypes.put("xml", "text/xml");
+        _mimeTypes.put("txt", "text/plain");
+        _mimeTypes.put("text", "text/plain");
+        _mimeTypes.put("asc", "text/plain");
+        _mimeTypes.put("sql", "text/plain");
     }
 
     public static String ext2mimeType(String ext) {

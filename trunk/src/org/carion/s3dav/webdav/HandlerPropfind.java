@@ -25,6 +25,7 @@ import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavObject;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.util.BaseXmlParser;
 import org.carion.s3dav.util.Util;
 import org.carion.s3dav.util.XMLWriter;
@@ -73,7 +74,7 @@ public class HandlerPropfind extends HandlerBase {
         } else {
             _mode = MODE_ALL_PROPERTIES;
         }
-        String url = request.getUrl();
+        S3UrlName url = request.getUrl();
         if (!_repository.objectExists(url)) {
             response.setResponseStatus(WebdavResponse.SC_NOT_FOUND);
         } else {
@@ -83,14 +84,13 @@ public class HandlerPropfind extends HandlerBase {
         }
     }
 
-    private void process(XMLWriter writer, int depth, String href)
+    private void process(XMLWriter writer, int depth, S3UrlName href)
             throws IOException {
-        href = normalize(href);
         boolean isFolder = _repository.isFolder(href);
         WebdavFolder folder = null;
 
         writer.opening("response");
-        writer.property("href", href);
+        writer.property("href", href.getUrlEncodedUri());
 
         if (isFolder) {
             folder = _repository.getFolder(href);
@@ -102,9 +102,9 @@ public class HandlerPropfind extends HandlerBase {
         writer.closing("response");
 
         if (isFolder && (depth > 0)) {
-            String[] uris = folder.getChildrenUris();
+            S3UrlName[] uris = folder.getChildrenUris();
             for (int i = 0; i < uris.length; i++) {
-                String uri = uris[i];
+                S3UrlName uri = uris[i];
                 process(writer, depth - 1, uri);
             }
         }
@@ -280,15 +280,4 @@ public class HandlerPropfind extends HandlerBase {
             }
         }
     }
-
-    public String normalize(String href) throws IOException {
-        href = Util.urlDecode(href.trim());
-        if (_repository.isFolder(href)) {
-            if (!href.endsWith("/")) {
-                href = href + "/";
-            }
-        }
-        return href;
-    }
-
 }

@@ -15,8 +15,8 @@
  */
 package org.carion.s3dav;
 
-import org.carion.s3dav.log.S3Log;
 import org.carion.s3dav.log.S3LogImpl;
+import org.carion.s3dav.repository.S3Log;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.s3.Credential;
 import org.carion.s3dav.s3.CredentialFactory;

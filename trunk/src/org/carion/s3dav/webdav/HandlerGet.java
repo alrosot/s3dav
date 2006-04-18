@@ -21,6 +21,7 @@ import org.carion.s3dav.repository.WebdavFolder;
 import org.carion.s3dav.repository.WebdavObject;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 import org.carion.s3dav.util.Util;
 import org.carion.s3dav.webdav.htmlPages.AdminPage;
 import org.carion.s3dav.webdav.htmlPages.BrowserPage;
@@ -49,10 +50,10 @@ public class HandlerGet extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String href = request.getUrl();
+        S3UrlName href = request.getUrl();
 
         // catch request to admin pages
-        if (href.startsWith("/index.html")) {
+        if (href.getUri().startsWith("/index.html")) {
             AdminPage page = new AdminPage(request, _repository);
             String body = page.getHtmlPage();
 
@@ -118,8 +119,8 @@ public class HandlerGet extends HandlerBase {
     protected String getFolderHtmlPage(WebdavFolder folder,
             WebdavRequest request) throws IOException {
         StringBuffer sb = new StringBuffer();
-        sb.append("<html><header><title>List of files in:" + folder.getURI()
-                + "</title>");
+        sb.append("<html><header><title>List of files in:"
+                + folder.getUrl().getUri() + "</title>");
         sb.append("<style type=\"text/css\">");
         sb.append("body {");
         sb.append("    background-color: #FFFFFF;");
@@ -153,14 +154,14 @@ public class HandlerGet extends HandlerBase {
         sb.append("</header>");
         sb.append("<body><table>");
         sb.append("<tr><th>File name</th><th>size</th><th>type</th></tr>");
-        String[] files = folder.getChildrenUris();
+        S3UrlName[] files = folder.getChildrenUris();
 
         int lineno = 0;
         String className;
 
         // pass #1: the directories
         for (int i = 0; i < files.length; i++) {
-            String uri = files[i];
+            S3UrlName uri = files[i];
             if (_repository.isFolder(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavFolder res = _repository.getFolder(uri);
@@ -173,7 +174,7 @@ public class HandlerGet extends HandlerBase {
             }
         }
         for (int i = 0; i < files.length; i++) {
-            String uri = files[i];
+            S3UrlName uri = files[i];
             if (_repository.isResource(uri)) {
                 className = ((lineno % 2) == 0) ? "cell_0" : "cell_1";
                 WebdavResource res = _repository.getResource(uri);
@@ -193,6 +194,6 @@ public class HandlerGet extends HandlerBase {
     }
 
     private String mkUrl(WebdavObject res, WebdavRequest request) {
-        return "http://" + request.getHost() + res.getURI();
+        return "http://" + request.getHost() + res.getUrl().getUri();
     }
 }

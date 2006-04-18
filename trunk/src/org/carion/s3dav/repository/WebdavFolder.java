@@ -17,10 +17,12 @@ package org.carion.s3dav.repository;
 
 import java.io.IOException;
 
+import org.carion.s3dav.s3.naming.S3UrlName;
+
 public interface WebdavFolder extends WebdavObject {
     WebdavFolder createFolder(String name) throws IOException;
 
     WebdavResource createResource(String name) throws IOException;
 
-    String[] getChildrenUris() throws IOException;
+    S3UrlName[] getChildrenUris() throws IOException;
 }

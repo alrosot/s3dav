@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
+import org.carion.s3dav.s3.naming.S3UrlName;
 
 /**
  * Handles 'MKCOL' request
@@ -57,14 +58,14 @@ public class HandlerMkcol extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String uri = request.getUrl();
+        S3UrlName uri = request.getUrl();
 
         if (_repository.objectExists(uri)) {
             response.setResponseStatus(WebdavResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
 
-        String parent = _repository.getParentUri(uri);
+        S3UrlName parent = uri.getParent();
         if (parent != null) {
             if (!_repository.isFolder(parent)) {
                 response.setResponseStatus(WebdavResponse.SC_CONFLICT);

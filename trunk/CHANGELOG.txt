@@ -1,4 +1,16 @@
 ## Changelog
+* FIX: change the InputStream management.
+  s3DAV has now been tested with DAV Explorer
+  (http://www.ics.uci.edu/~webdav/download.html).
+  Thank you Laurian G. for telling me about DAV Explorer.
+
+* NEW: there is now a cache mechanism used to cache the 'HEAD' requests.
+  This should improve the performances as a lot of 'HEAD' request are
+  done to get the status of the file system.
+
+* FIX: you can now create directories and files with spacs or & in their
+  name
+
 * NEW: in the "buckets page", from the "raw listing" link,
   you can now list *all* the objects sored in your bucket.
   You'll see there any object, even those not stored through s3DAV and

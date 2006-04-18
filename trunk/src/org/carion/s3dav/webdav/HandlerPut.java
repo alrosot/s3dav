@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.repository.WebdavResource;
+import org.carion.s3dav.s3.naming.S3UrlName;
 
 /**
  * Handles 'PUT' request
@@ -32,7 +33,7 @@ public class HandlerPut extends HandlerBase {
 
     void process(WebdavRequest request, WebdavResponse response)
             throws IOException {
-        String url = request.getUrl();
+        S3UrlName url = request.getUrl();
 
         if (_repository.objectExists(url)) {
             if (_repository.isFolder(url)) {
@@ -44,7 +45,7 @@ public class HandlerPut extends HandlerBase {
                 response.setResponseStatus(WebdavResponse.SC_CREATED);
             }
         } else {
-            String parent = _repository.getParentUri(url);
+            S3UrlName parent = url.getParent();
             if (parent != null) {
                 if (!_repository.isFolder(parent)) {
                     response.setResponseStatus(WebdavResponse.SC_CONFLICT);

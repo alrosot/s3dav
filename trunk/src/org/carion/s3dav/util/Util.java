@@ -50,14 +50,13 @@ public class Util {
     public static InputStream wrap(InputStream in, boolean keepAlive,
             long contentLength, InputStreamObserver observer)
             throws IOException {
-        if (!keepAlive) {
-            return new WrappedInputStream(in, keepAlive, observer);
-        } else if (contentLength >= 0) {
+        if (contentLength >= 0) {
             return new ContentLengthInputStream(in, contentLength, keepAlive,
                     observer);
+        } else if (!keepAlive) {
+            return new WrappedInputStream(in, keepAlive, observer);
         } else {
-            throw new IOException("Can't wrap keepAlive:" + keepAlive
-                    + " contentLength:" + contentLength);
+            return new NullInputStream(keepAlive, contentLength);
         }
     }
 
@@ -77,6 +76,11 @@ public class Util {
             output.write(buffer, 0, n);
             count += n;
         }
+
+        //        while ((n = input.read()) != -1) {
+        //            output.write((byte) n);
+        //            count++;
+        //        }
         return count;
     }
 

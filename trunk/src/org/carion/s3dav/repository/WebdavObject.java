@@ -18,10 +18,12 @@ package org.carion.s3dav.repository;
 import java.io.IOException;
 import java.util.Date;
 
-public interface WebdavObject {
-    String getName();
+import org.carion.s3dav.s3.naming.S3UrlName;
 
-    String getURI();
+public interface WebdavObject {
+    S3UrlName getUrl();
+
+    String getName();
 
     Date getLastModified() throws IOException;
 

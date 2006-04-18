@@ -22,12 +22,15 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.carion.s3dav.log.S3Log;
+import org.carion.s3dav.repository.S3Log;
+import org.carion.s3dav.s3.naming.S3UrlName;
+import org.carion.s3dav.s3.naming.impl.WebdavResourceName;
 import org.carion.s3dav.util.Util;
 
 /**
@@ -41,7 +44,9 @@ public class WebdavRequest {
 
     private final String _method;
 
-    private final String _url;
+    private final WebdavResourceName _resourceName;
+
+    private final String _queryParameters;
 
     private final String _protocol;
 
@@ -59,8 +64,24 @@ public class WebdavRequest {
         _log = log;
         StringTokenizer tokenizer = new StringTokenizer(_startLine);
         _method = tokenizer.nextToken();
-        _url = Util.urlDecode(tokenizer.nextToken());
+        String url = tokenizer.nextToken();
+        int queryIndex = url.indexOf('?');
+        if (queryIndex > 0) {
+            if ((queryIndex + 1) < url.length()) {
+                _queryParameters = url.substring(queryIndex + 1);
+                url = url.substring(0, queryIndex);
+            } else {
+                _queryParameters = null;
+            }
+        } else {
+            _queryParameters = null;
+        }
+        _resourceName = new WebdavResourceName(url, true);
         _protocol = tokenizer.nextToken();
+    }
+
+    public S3UrlName getUrl() {
+        return _resourceName;
     }
 
     void setInputStream(InputStream inputStream) {
@@ -71,8 +92,8 @@ public class WebdavRequest {
         return _startLine;
     }
 
-    public String getUrl() {
-        return _url;
+    public WebdavResourceName getResourceName() {
+        return _resourceName;
     }
 
     public String getMethod() {
@@ -94,7 +115,7 @@ public class WebdavRequest {
 
     boolean getKeepAlive() {
         String keepAliveHeader = getHttpHeader("Connection");
-        if ("Keep-Alive".equals(keepAliveHeader)) {
+        if (keepAliveHeader.indexOf("Keep-Alive") >= 0) {
             return true;
         } else {
             return false;
@@ -125,7 +146,13 @@ public class WebdavRequest {
     }
 
     public String getHttpHeader(String key) {
-        return (String) _httpHeaders.get(key);
+        for (Iterator iter = _httpHeaders.keySet().iterator(); iter.hasNext();) {
+            String hkey = (String) iter.next();
+            if (hkey.equalsIgnoreCase(key)) {
+                return (String) _httpHeaders.get(hkey);
+            }
+        }
+        return null;
     }
 
     public void setHttpHeader(String key, String value) {
@@ -160,15 +187,18 @@ public class WebdavRequest {
         return overwrite;
     }
 
-    public String getDestination() {
+    /**
+     * Destination is something like this: http://127.0.0.1:8070/pierre/a%26c
+     *
+     * @return
+     */
+    public WebdavResourceName getDestination() {
         String destination = getHeader("Destination");
 
         _log.log("Destination header: (" + destination + ")");
         if (destination == null) {
             return null;
         }
-        // Remove url encoding from destination
-        destination = Util.urlDecode(destination);
 
         // let's look for the first single '/' , not preceded by another '/'
         int position = -1;
@@ -192,16 +222,12 @@ public class WebdavRequest {
 
         destination = destination.substring(position);
 
-        return destination;
+        return new WebdavResourceName(destination, true);
     }
 
     public void parseParameters(HashMap parameters) throws IOException {
-        int queryIndex = _url.indexOf('?');
-        if (queryIndex > 0) {
-            if ((queryIndex + 1) < _url.length()) {
-                String query = _url.substring(queryIndex + 1);
-                addParameters(parameters, query);
-            }
+        if (_queryParameters != null) {
+            addParameters(parameters, _queryParameters);
         }
 
         String contentType = getHttpHeader("Content-Type");

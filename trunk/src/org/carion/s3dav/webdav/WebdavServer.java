@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.carion.s3dav.log.S3Log;
+import org.carion.s3dav.repository.S3Log;
 import org.carion.s3dav.repository.WebdavRepository;
 import org.carion.s3dav.util.Util;
 
@@ -295,7 +295,7 @@ public class WebdavServer extends Thread {
 
                     // for now ... let's just print the exception
                     // TODO: proper error management required here
-                    _log.log("Ubexpected error", ex);
+                    _log.log("Unexpected error", ex);
                 }
             }
 
