@@ -31,7 +31,7 @@ package org.carion.s3dav;
  * are done to get the status of the file system
  */
 public class Version {
-    public final static String VERSION = "0.5";
+    public final static String VERSION = "0.7";
 
     public final static String USER_AGENT = "s3DAV/" + VERSION;
 }
