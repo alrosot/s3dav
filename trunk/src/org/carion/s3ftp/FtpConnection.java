@@ -95,7 +95,7 @@ public class FtpConnection implements Runnable {
     public void run() {
         String incomingString = null;
 
-        output("220 s3DAV/FTP Server " + Version.VERSION);
+        output("220 " + Version.USER_AGENT);
 
         while (_running) {
             try {
@@ -123,176 +123,183 @@ public class FtpConnection implements Runnable {
 
         _log.log("parse> " + command);
 
-        if (ftpCommand.equalsIgnoreCase("USER")) {
-            try {
-                user(st.nextToken());
-            } catch (NoSuchElementException nse) {
+        try {
+
+            if (ftpCommand.equalsIgnoreCase("USER")) {
+                try {
+                    user(st.nextToken());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("PASS")) {
-            try {
-                pass(st.nextToken());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("PASS")) {
+                try {
+                    pass(st.nextToken());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (!_isLoggedIn) {
-            output("530 Login incorrect");
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("PWD")
-                || ftpCommand.equalsIgnoreCase("XPWD")) {
-            pwd();
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("SYST")) {
-            syst();
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("QUIT")) {
-            quit();
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("LIST")) {
-            list(false);
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("NLST")) {
-            list(true);
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("CDUP")) {
-            cdup();
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("CWD")) {
-            try {
-                cwd(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (!_isLoggedIn) {
+                output("530 Login incorrect");
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("RETR")) {
-            try {
-                retr(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("PWD")
+                    || ftpCommand.equalsIgnoreCase("XPWD")) {
+                pwd();
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("TYPE")) {
-            try {
-                type(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("SYST")) {
+                syst();
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("STRU")) {
-            try {
-                stru(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("QUIT")) {
+                quit();
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("MODE")) {
-            try {
-                mode(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("LIST")) {
+                list(false);
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("STOR")) {
-            try {
-                stor(allRemainingTokens(st).trim(), false);
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("NLST")) {
+                list(true);
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("APPE")) {
-            try {
-                stor(allRemainingTokens(st).trim(), true);
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("CDUP")) {
+                cdup();
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("PORT")) {
-            try {
-                port(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("CWD")) {
+                try {
+                    cwd(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("DELE")) {
-            try {
-                dele(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("RETR")) {
+                try {
+                    retr(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("NOOP")) {
-            noop();
-            return;
-        }
-
-        if (ftpCommand.equalsIgnoreCase("REST")) {
-            try {
-                rest(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("TYPE")) {
+                try {
+                    type(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("RNFR")) {
-            try {
-                rnfr(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("STRU")) {
+                try {
+                    stru(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("RNTO")) {
-            try {
-                rnto(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("MODE")) {
+                try {
+                    mode(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("MKD")) {
-            try {
-                mkd(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("STOR")) {
+                try {
+                    stor(allRemainingTokens(st).trim(), false);
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
-        }
 
-        if (ftpCommand.equalsIgnoreCase("RMD")
-                || ftpCommand.equalsIgnoreCase("XRMD")) {
-            try {
-                rmd(allRemainingTokens(st).trim());
-            } catch (NoSuchElementException nse) {
+            if (ftpCommand.equalsIgnoreCase("APPE")) {
+                try {
+                    stor(allRemainingTokens(st).trim(), true);
+                } catch (NoSuchElementException nse) {
+                }
+                return;
             }
-            return;
+
+            if (ftpCommand.equalsIgnoreCase("PORT")) {
+                try {
+                    port(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("DELE")) {
+                try {
+                    dele(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("NOOP")) {
+                noop();
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("REST")) {
+                try {
+                    rest(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("RNFR")) {
+                try {
+                    rnfr(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("RNTO")) {
+                try {
+                    rnto(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("MKD")) {
+                try {
+                    mkd(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+
+            if (ftpCommand.equalsIgnoreCase("RMD")
+                    || ftpCommand.equalsIgnoreCase("XRMD")) {
+                try {
+                    rmd(allRemainingTokens(st).trim());
+                } catch (NoSuchElementException nse) {
+                }
+                return;
+            }
+            output("502 " + ftpCommand + " command not supported");
+        } catch (Exception ex) {
+            _log.log("Error processing:" + ftpCommand, ex);
+            output("550 " + ftpCommand + " command failed");
+
         }
-        output("502 " + ftpCommand + " command not supported");
     }
 
     /**
@@ -339,7 +346,7 @@ public class FtpConnection implements Runnable {
         endSession();
     }
 
-    public void cwd(String commandArgs) {
+    public void cwd(String commandArgs) throws IOException {
         if (_directory.setDirectory(commandArgs)) {
             output("250 CWD command successfull");
         } else {
@@ -360,17 +367,17 @@ public class FtpConnection implements Runnable {
      * details if the shortForm parameter is false, otherwise it sends just a
      * stripped down list of file names.
      */
-    public void list(boolean shortForm) {
-        Socket listSocket = getDataConnection();
+    public void list(boolean shortForm) throws IOException {
+        Socket dataSocket = getDataConnection();
         output("150 Opening ASCII mode data connection for LIST command");
 
         List children = _directory.getChildren();
 
-        if (children.size() > 0) {
-            OutputStream out = null;
+        try {
+            if (children.size() > 0) {
+                OutputStream out = null;
 
-            try {
-                out = listSocket.getOutputStream();
+                out = dataSocket.getOutputStream();
                 PrintWriter writer = new PrintWriter(
                         new OutputStreamWriter(out));
 
@@ -382,21 +389,23 @@ public class FtpConnection implements Runnable {
                     } else {
                         if (child.isDirectory()) {
                             writer.println("dr-xr-xr-x 1 owner group 0 "
-                                    + child.getDate() + " " + child.getName());
+                                    + child.getFtpDate() + " "
+                                    + child.getName());
                         } else {
                             writer.println("-r-xr-xr-x 1 owner group  "
-                                    + child.getSize() + " " + child.getDate()
-                                    + " " + child.getName());
+                                    + child.getSize() + " "
+                                    + child.getFtpDate() + " "
+                                    + child.getName());
                         }
                     }
                 }
                 writer.close();
-                listSocket.close();
-                output("226 ASCII transfer complete");
-            } catch (IOException ex) {
-                _log.log("Can't list content of:" + _directory.getName(), ex);
-                output("550 CDUP command failed");
+                dataSocket.close();
             }
+            output("226 ASCII transfer complete");
+        } catch (IOException ex) {
+            _log.log("Can't list content of:" + _directory.getName(), ex);
+            output("550 CDUP command failed");
         }
     }
 
