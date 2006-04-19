@@ -10,7 +10,7 @@ import org.carion.s3.S3Log;
 import org.carion.s3.S3Repository;
 import org.carion.s3.util.S3LogImpl;
 
-public class FTPServer extends Thread {
+public class FtpServer extends Thread {
     private final S3Log _log;
 
     private final String _userName;
@@ -27,7 +27,7 @@ public class FTPServer extends Thread {
 
     private boolean _running;
 
-    public FTPServer(String userName, String password, int port,
+    public FtpServer(String userName, String password, int port,
             S3Repository repository, S3Log log) {
         _log = log;
         _repository = repository;
