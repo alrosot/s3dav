@@ -22,9 +22,11 @@ import org.carion.s3.impl.CredentialFactory;
 import org.carion.s3.impl.S3RepositoryImpl;
 import org.carion.s3.util.S3LogImpl;
 import org.carion.s3dav.webdav.WebdavServer;
+import org.carion.s3ftp.FTPServer;
 
 public class Main {
     private final static int WEBDAVSERVER_PORT = 8070;
+
     private final static int FTPSERVER_PORT = 8060;
 
     public static void main(String[] args) {
@@ -32,11 +34,14 @@ public class Main {
             S3Log log = new S3LogImpl(System.out);
             log.log("s3DAV - version:" + Version.VERSION);
             Credential credential = CredentialFactory.getCredential();
-            S3Repository repository = new S3RepositoryImpl(credential,
-                    log.getLogger(">s3>"));
-            WebdavServer X = new WebdavServer(WEBDAVSERVER_PORT, repository,
+            S3Repository repository = new S3RepositoryImpl(credential, log
+                    .getLogger(">s3>"));
+            WebdavServer webdavServer = new WebdavServer(WEBDAVSERVER_PORT, repository,
                     log.getLogger(">dav>"));
-            X.start();
+            webdavServer.start();
+            FTPServer ftpServer = new FTPServer("s3dav", "s3dav",
+                    FTPSERVER_PORT, repository, log.getLogger(">ftp>"));
+            ftpServer.start();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
