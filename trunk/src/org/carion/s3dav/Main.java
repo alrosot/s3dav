@@ -27,7 +27,7 @@ import org.carion.s3ftp.FtpServer;
 public class Main {
     private final static int WEBDAVSERVER_PORT = 8070;
 
-    private final static int FTPSERVER_PORT = 8060;
+    private final static int FTPSERVER_PORT = 21;
 
     public static void main(String[] args) {
         try {
