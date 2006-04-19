@@ -43,8 +43,6 @@ public class FtpConnection implements Runnable {
 
     private boolean _inBinaryMode = false;
 
-    private boolean _debugMode = true;
-
     private BufferedReader _input;
 
     private PrintWriter _output;
