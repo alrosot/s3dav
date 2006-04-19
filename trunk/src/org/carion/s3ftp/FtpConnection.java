@@ -30,10 +30,10 @@ import org.carion.s3dav.Version;
  * @author pcarion
  * 
  */
-public class FTPConnection implements Runnable {
+public class FtpConnection implements Runnable {
     private final S3Log _log;
 
-    private final FTPServer _ftpServer;
+    private final FtpServer _ftpServer;
 
     private final Socket _socket;
 
@@ -61,7 +61,7 @@ public class FTPConnection implements Runnable {
 
     private int resumePosition;
 
-    public FTPConnection(FTPServer ftpServer, Socket socket,
+    public FtpConnection(FtpServer ftpServer, Socket socket,
             FtpDirectory directory, S3Log log) {
         _log = log;
         _isLoggedIn = false;
@@ -704,8 +704,7 @@ public class FTPConnection implements Runnable {
         String fixedName = fileName;
 
         if (fileName.indexOf('\\') > 0) {
-            fixedName = fileName
-                    .substring(fileName.lastIndexOf('\\') + 1);
+            fixedName = fileName.substring(fileName.lastIndexOf('\\') + 1);
         } else if (fileName.indexOf('/') > 0) {
             fixedName = fileName.substring(fileName.lastIndexOf('/') + 1);
         }

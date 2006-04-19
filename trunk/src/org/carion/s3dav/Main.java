@@ -22,7 +22,7 @@ import org.carion.s3.impl.CredentialFactory;
 import org.carion.s3.impl.S3RepositoryImpl;
 import org.carion.s3.util.S3LogImpl;
 import org.carion.s3dav.webdav.WebdavServer;
-import org.carion.s3ftp.FTPServer;
+import org.carion.s3ftp.FtpServer;
 
 public class Main {
     private final static int WEBDAVSERVER_PORT = 8070;
@@ -36,10 +36,10 @@ public class Main {
             Credential credential = CredentialFactory.getCredential();
             S3Repository repository = new S3RepositoryImpl(credential, log
                     .getLogger(">s3>"));
-            WebdavServer webdavServer = new WebdavServer(WEBDAVSERVER_PORT, repository,
-                    log.getLogger(">dav>"));
+            WebdavServer webdavServer = new WebdavServer(WEBDAVSERVER_PORT,
+                    repository, log.getLogger(">dav>"));
             webdavServer.start();
-            FTPServer ftpServer = new FTPServer("s3dav", "s3dav",
+            FtpServer ftpServer = new FtpServer("s3dav", "s3dav",
                     FTPSERVER_PORT, repository, log.getLogger(">ftp>"));
             ftpServer.start();
         } catch (Exception ex) {
