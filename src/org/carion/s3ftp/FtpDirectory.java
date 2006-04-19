@@ -3,15 +3,25 @@ package org.carion.s3ftp;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.carion.s3.S3Folder;
 import org.carion.s3.S3Repository;
+import org.carion.s3.S3Resource;
+import org.carion.s3.S3UrlName;
+import org.carion.s3.impl.S3UrlNameImpl;
 
 public class FtpDirectory {
     private String _name;
 
     private final S3Repository _repository;
+
+    private final static SimpleDateFormat _formatter = new SimpleDateFormat(
+            "MMM dd yyyy");
 
     FtpDirectory(S3Repository repository) {
         _repository = repository;
@@ -22,16 +32,55 @@ public class FtpDirectory {
         return _name;
     }
 
-    boolean setDirectory(String directory) {
-        return true;
+    boolean setDirectory(String directory) throws IOException {
+        String newDirectory = cleanupName(directory);
+        if (!newDirectory.startsWith("/")) {
+            if (_name.equals("/")) {
+                newDirectory = "/" + newDirectory;
+            } else {
+                newDirectory = _name + "/" + newDirectory;
+            }
+        }
+        S3UrlName name = new S3UrlNameImpl(newDirectory, false);
+        if (_repository.isFolder(name)) {
+            _name = newDirectory;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     boolean cdup() {
-        return true;
+        S3UrlName name = new S3UrlNameImpl(_name, false);
+        S3UrlName parent = name.getParent();
+        if (parent == null) {
+            return false;
+        } else {
+            _name = parent.getUri();
+            return true;
+        }
     }
 
-    List getChildren() {
-        return null;
+    List getChildren() throws IOException {
+        S3UrlName name = new S3UrlNameImpl(_name, false);
+        S3Folder folder = _repository.getFolder(name);
+        S3UrlName[] files = folder.getChildrenUris();
+        List result = new ArrayList();
+        // pass #1: the directories
+        for (int i = 0; i < files.length; i++) {
+            S3UrlName uri = files[i];
+            Child child;
+            if (_repository.isFolder(uri)) {
+                S3Folder f = _repository.getFolder(uri);
+                child = new Child(f.getName(), f.getLastModified(), 0, true);
+            } else {
+                S3Resource r = _repository.getResource(uri);
+                child = new Child(r.getName(), r.getLastModified(), r
+                        .getLength(), false);
+            }
+            result.add(child);
+        }
+        return result;
     }
 
     BufferedReader getReader(String name) {
@@ -99,6 +148,34 @@ public class FtpDirectory {
 
         public boolean isDirectory() {
             return _isDirectory;
+        }
+
+        public String getFtpDate() {
+            return _formatter.format(_date);
+        }
+    }
+
+    private String cleanupName(String name) {
+        name = name.trim();
+        StringBuffer sb = new StringBuffer();
+        boolean prevIsSlash = false;
+
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if ((c == '/') || (c == '\\')) {
+                if (!prevIsSlash) {
+                    sb.append('/');
+                }
+                prevIsSlash = true;
+            } else {
+                prevIsSlash = false;
+                sb.append(c);
+            }
+        }
+        if (sb.charAt(sb.length() - 1) == '/') {
+            return sb.substring(0, sb.length() - 1);
+        } else {
+            return sb.toString();
         }
     }
 }
