@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.carion.s3.S3Log;
+import org.carion.s3.S3Repository;
 import org.carion.s3.util.S3LogImpl;
 
 public class FTPServer extends Thread {
@@ -20,20 +21,19 @@ public class FTPServer extends Thread {
 
     private final List _connections = new ArrayList();
 
-    private ServerSocket _serverSocket;
+    private final S3Repository _repository;
 
-    private FTPObject rootObject;
+    private ServerSocket _serverSocket;
 
     private boolean _running;
 
-    public FTPServer(String userName, String password, int port, S3Log log) {
+    public FTPServer(String userName, String password, int port,
+            S3Repository repository, S3Log log) {
         _log = log;
+        _repository = repository;
         _userName = userName;
         _password = password;
         _port = port;
-
-        rootObject = new FTPObject("root", "root", 0, true, null);
-        rootObject.addChild(new FTPObject("C", new File("/"), rootObject));
 
         try {
             _serverSocket = new ServerSocket(_port);
@@ -47,7 +47,7 @@ public class FTPServer extends Thread {
     }
 
     /**
-     *   Waits for and accepts client connections.
+     * Waits for and accepts client connections.
      */
     public void run() {
         FTPConnection newConnection;
@@ -55,13 +55,12 @@ public class FTPServer extends Thread {
         _running = true;
 
         _log.log("Port: " + _serverSocket.getLocalPort());
-        S3Log logConn = _log.getLogger(">conn>");
 
         while (_running) {
             try {
                 Socket incoming = _serverSocket.accept();
-                newConnection = new FTPConnection(this, incoming, rootObject,
-                        rootObject, logConn);
+                newConnection = new FTPConnection(this, incoming,
+                        new FtpDirectory(_repository), _log);
                 newConnection.start();
                 _connections.add(newConnection);
             } catch (Exception e) {
@@ -71,16 +70,8 @@ public class FTPServer extends Thread {
     }
 
     /**
-     *   Return the server's root object (the top of the directory
-     *   tree).
-     */
-    public FTPObject getRoot() {
-        return rootObject;
-    }
-
-    /**
-     *   Called by an active FTPConnection object just as it becomes
-     *   inactive, normally, or due to an error.
+     * Called by an active FTPConnection object just as it becomes inactive,
+     * normally, or due to an error.
      */
     public void signalConnectionTerminated(FTPConnection connection) {
         _connections.remove(connection);
@@ -92,14 +83,5 @@ public class FTPServer extends Thread {
 
     boolean isValidPassword(String password) {
         return _password.equals(password);
-    }
-
-    public static void main(String[] args) {
-        FTPServer ftp;
-        S3Log log = new S3LogImpl(System.out);
-
-        ftp = new FTPServer("pierre", "password", 21, log);
-
-        ftp.start();
     }
 }
