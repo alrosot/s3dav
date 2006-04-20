@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.carion.s3dav.webdav.htmlPages;
+package org.carion.s3.admin.htmlPages;
 
 public class HtmlWriter {
     private final StringBuffer _buf = new StringBuffer();
