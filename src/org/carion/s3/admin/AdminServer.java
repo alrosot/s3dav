@@ -20,7 +20,7 @@ import org.carion.s3.util.Util;
 
 public class AdminServer extends HttpServer implements HttpProcessing {
     private final LogWriter _logWriter;
-    
+
     private final S3UploadManager _uploadManager;
 
     public AdminServer(int port, S3Repository repository, LogWriter logWriter,
@@ -43,7 +43,8 @@ public class AdminServer extends HttpServer implements HttpProcessing {
 
         // catch request to admin pages
         if (href.getUri().startsWith("/index.html")) {
-            AdminPage page = new AdminPage(request, _repository, _logWriter);
+            AdminPage page = new AdminPage(request, _repository,
+                    _uploadManager, _logWriter);
             String body = page.getHtmlPage();
 
             response.setResponseHeader("last-modified", Util.getHttpDate());

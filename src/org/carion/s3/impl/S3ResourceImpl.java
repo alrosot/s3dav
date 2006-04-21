@@ -20,6 +20,7 @@ import java.io.InputStream;
 
 import org.carion.s3.Credential;
 import org.carion.s3.S3Resource;
+import org.carion.s3.S3UploadManager;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.operations.ObjectDELETE;
 import org.carion.s3.operations.ObjectGET;
@@ -29,8 +30,7 @@ import org.carion.s3.util.MemoryMappedFile;
 import org.carion.s3.util.MimeTypes;
 import org.carion.s3.util.Util;
 
-public class S3ResourceImpl extends S3ObjectImpl implements
-        S3Resource {
+public class S3ResourceImpl extends S3ObjectImpl implements S3Resource {
 
     S3ResourceImpl(S3UrlName name, Credential credential,
             S3RepositoryImpl repository) {
@@ -63,25 +63,9 @@ public class S3ResourceImpl extends S3ObjectImpl implements
 
     public void setResourceContent(InputStream content, String contentType,
             long length) throws IOException {
-        ObjectPUT ope = _repository.mkObjectPUT(_name.getResourceKey());
+        S3UploadManager uploadManager = _repository.getUploadmanager();
 
-        MemoryMappedFile mappedFile = null;
-
-        _repository.getLog().log(
-                "Creating memory mapped file for:" + _name.getUri()
-                        + ",length=" + length + " inputStream=" + content);
-        try {
-            mappedFile = Util.mkMemoryMapFile(content, length);
-
-            if (!ope.execute(mappedFile.getByteBuffer(), contentType)) {
-                throw new IOException("Can't PUT:" + _name.getResourceKey());
-            }
-        } finally {
-            if (mappedFile != null) {
-                mappedFile.delete();
-            }
-            content.close();
-        }
+        uploadManager.upload(_name, content, contentType, length);
     }
 
     public void remove() throws IOException {

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.carion.s3.S3Repository;
+import org.carion.s3.S3UploadManager;
 import org.carion.s3.http.HttpRequest;
 import org.carion.s3.impl.S3RepositoryImpl;
 import org.carion.s3.util.LogWriter;
@@ -36,8 +37,10 @@ import org.carion.s3dav.Version;
  */
 public class AdminPage {
     private final S3RepositoryImpl _repository;
-    
+
     private final LogWriter _logWriter;
+
+    private final S3UploadManager _uploadManager;
 
     private final HttpRequest _request;
 
@@ -51,6 +54,7 @@ public class AdminPage {
         _pages.add(new WelcomePage("welcome"));
         _pages.add(new AccountPage("account"));
         _pages.add(new BucketsPage("buckets"));
+        _pages.add(new UploadsPage("uploads"));
         _pages.add(new SupportPage("support"));
         _pages.add(new LogsPage("logs"));
         _pages.add(new CreditsPage("credits"));
@@ -58,10 +62,12 @@ public class AdminPage {
         _pages.add(new DeleteObjectPage("deleteobject"));
     }
 
-    public AdminPage(HttpRequest request, S3Repository repository, LogWriter logWriter) {
+    public AdminPage(HttpRequest request, S3Repository repository,
+            S3UploadManager uploadManager, LogWriter logWriter) {
         _repository = (S3RepositoryImpl) repository;
         _request = request;
         _logWriter = logWriter;
+        _uploadManager = uploadManager;
         try {
             _request.parseParameters(_parameters);
         } catch (IOException ex) {
@@ -85,7 +91,7 @@ public class AdminPage {
         if (thePage == null) {
             thePage = new WelcomePage("");
         }
-        thePage.setContext(_w, this, _repository, _logWriter);
+        thePage.setContext(_w, this, _repository, _logWriter, _uploadManager);
         return thePage;
     }
 

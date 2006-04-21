@@ -44,7 +44,7 @@ public class S3UploadManagerImpl implements S3UploadManager {
             long length) throws IOException {
         ObjectPUT ope = _repository.mkObjectPUT(name.getResourceKey());
 
-        S3UploadImpl upload = new S3UploadImpl(name, _baseDirectory, this);
+        S3UploadImpl upload = new S3UploadImpl(name, _baseDirectory, _repository.getS3Cache(), this);
 
         try {
             upload.loadContent(content, length);
