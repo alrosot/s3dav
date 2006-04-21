@@ -83,6 +83,10 @@ public class S3RepositoryImpl implements S3Repository {
     public S3UploadManager getUploadmanager() {
         return _uploadManager;
     }
+    
+    public Cache getS3Cache() {
+        return _s3ObjectCache;
+    }
 
     /**
      * This method is called by the HTML admin page when the user enters his

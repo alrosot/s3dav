@@ -34,17 +34,22 @@ public class S3UploadImpl implements S3UploadManager.Upload {
 
     private final File _file;
 
+    private FileChannel _roChannel;
+
     private final S3UploadManagerImpl _manager;
+
+    private final Cache _cache;
 
     private long _size;
 
     private UploadTask _task;
 
-    S3UploadImpl(S3UrlName name, File baseDirectory, S3UploadManagerImpl manager)
-            throws IOException {
+    S3UploadImpl(S3UrlName name, File baseDirectory, Cache cache,
+            S3UploadManagerImpl manager) throws IOException {
         _name = name;
-        _file = File.createTempFile("s3dav", "mem", baseDirectory);
+        _file = File.createTempFile("s3dav", ".mem", baseDirectory);
         _manager = manager;
+        _cache = cache;
     }
 
     public S3UrlName getName() {
@@ -88,7 +93,14 @@ public class S3UploadImpl implements S3UploadManager.Upload {
     }
 
     public void close() {
-        _file.delete();
+        System.out.println("@@@ close:" + _file);
+        try {
+            _roChannel.close();
+        } catch (Exception ex) {
+        }
+        if (!_file.delete()) {
+            System.out.println("@@@ can't close:" + _file);
+        }
     }
 
     void loadContent(InputStream in, long contentLength) throws IOException {
@@ -126,9 +138,9 @@ public class S3UploadImpl implements S3UploadManager.Upload {
     }
 
     ByteBuffer getByteBuffer() throws IOException {
-        FileChannel roChannel = new RandomAccessFile(_file, "r").getChannel();
-        ByteBuffer roBuf = roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
-                (int) roChannel.size());
+        _roChannel = new RandomAccessFile(_file, "r").getChannel();
+        ByteBuffer roBuf = _roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
+                (int) _roChannel.size());
         return roBuf;
     }
 
@@ -164,7 +176,7 @@ public class S3UploadImpl implements S3UploadManager.Upload {
         public void run() {
             try {
                 _state = STATE_STARTED;
-                if (!_ope.execute(getByteBuffer(), _contentType)) {
+                if (!_ope.execute(getByteBuffer(), _contentType, this)) {
                     throw new IOException("Can't PUT:" + _name.getResourceKey());
                 }
                 _state = STATE_FINISHED;
@@ -172,13 +184,15 @@ public class S3UploadImpl implements S3UploadManager.Upload {
                 _log.log("Can't upload content for:" + _name.getUri(), ex);
                 _state = STATE_ERROR;
             } finally {
+                _upload.close();
                 _manager.uploadDone(_upload, _state);
             }
         }
 
         public boolean ntfUploaded(int count) {
             _uploaded += count;
-            return _abort;
+            _cache.delete(_name.getResourceKey());
+            return !_abort;
         }
 
         public void abort() {
