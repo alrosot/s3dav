@@ -18,11 +18,13 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3.S3Repository;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 import org.carion.s3.impl.S3UrlNameImpl;
 
 /**
  * Handles 'COPY' request.
- *
+ * 
  * @author pcarion
  */
 public class HandlerCopy extends HandlerBase {
@@ -30,13 +32,13 @@ public class HandlerCopy extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         boolean overwrite = request.getOverwrite();
         S3UrlNameImpl destination = request.getDestination();
 
         if (destination == null) {
-            response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
+            response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -44,13 +46,13 @@ public class HandlerCopy extends HandlerBase {
             if (overwrite) {
                 _repository.deleteObject(destination);
             } else {
-                response.setResponseStatus(WebdavResponse.SC_FORBIDDEN);
+                response.setResponseStatus(HttpResponse.SC_FORBIDDEN);
                 return;
             }
         }
         _repository.copy(request.getResourceName(), destination);
 
-        response.setResponseStatus(WebdavResponse.SC_CREATED);
+        response.setResponseStatus(HttpResponse.SC_CREATED);
     }
 
 }

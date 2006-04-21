@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2006, Pierre Carion.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.carion.s3ftp;
 
 import java.io.BufferedInputStream;
@@ -11,6 +26,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -59,6 +75,12 @@ public class FtpConnection implements Runnable {
 
     private int resumePosition;
 
+    // this date is used to decide which date format to use for file date
+    // in list files command
+    private final Date _sixMonthsAgo;
+
+    private final static long SIX_MONTHS_DELTA = (long) (6L * 30L * 24L * 3600L * 1000L);
+
     public FtpConnection(FtpServer ftpServer, Socket socket,
             FtpDirectory directory, S3Log log) {
         _log = log;
@@ -71,6 +93,10 @@ public class FtpConnection implements Runnable {
         _directory = directory;
 
         resumePosition = 0;
+
+        Date now = new Date();
+        long time = now.getTime();
+        _sixMonthsAgo = new Date(time - SIX_MONTHS_DELTA);
     }
 
     public void start() {
@@ -388,13 +414,13 @@ public class FtpConnection implements Runnable {
                         writer.println(child.getName());
                     } else {
                         if (child.isDirectory()) {
-                            writer.println("dr-xr-xr-x 1 owner group 0 "
-                                    + child.getFtpDate() + " "
+                            writer.println("dr-xr-xr-x\t1\towner group\t0\t"
+                                    + child.getFtpDate(_sixMonthsAgo) + "\t"
                                     + child.getName());
                         } else {
-                            writer.println("-r-xr-xr-x 1 owner group  "
-                                    + child.getSize() + " "
-                                    + child.getFtpDate() + " "
+                            writer.println("-r-xr-xr-x\t1\towner\tgroup\t"
+                                    + child.getSize() + "\t"
+                                    + child.getFtpDate(_sixMonthsAgo) + "\t"
                                     + child.getName());
                         }
                     }

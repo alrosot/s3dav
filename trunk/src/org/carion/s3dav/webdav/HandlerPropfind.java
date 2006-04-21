@@ -26,6 +26,8 @@ import org.carion.s3.S3Object;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 import org.carion.s3.util.BaseXmlParser;
 import org.carion.s3.util.Util;
 import org.carion.s3.util.XMLWriter;
@@ -60,7 +62,7 @@ public class HandlerPropfind extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         String body = request.getBodyAsString();
 
@@ -76,11 +78,11 @@ public class HandlerPropfind extends HandlerBase {
         }
         S3UrlName url = request.getUrl();
         if (!_repository.objectExists(url)) {
-            response.setResponseStatus(WebdavResponse.SC_NOT_FOUND);
+            response.setResponseStatus(HttpResponse.SC_NOT_FOUND);
         } else {
             XMLWriter writer = response.getXMLWriter("multistatus");
             process(writer, request.getDepth(), url);
-            response.setResponseStatus(WebdavResponse.SC_MULTI_STATUS);
+            response.setResponseStatus(HttpResponse.SC_MULTI_STATUS);
         }
     }
 

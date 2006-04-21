@@ -22,24 +22,22 @@ import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
 
 /**
- * The PUT request operation is used to add an object to a bucket.
- * The response indicates that the object has been successfully stored.
- * S3 never stores partial objects: if you receive a successful response,
- * then you can be confident that the entire object was stored.
- * If the object already exists in the bucket, the new object overwrites the
- * existing object. S3 orders all of the requests that it receives.
- * it is possible that if you send two requests nearly simultaneously, we will
- * receive them in a different order than they were sent.
- * The last request received is the one which is stored in S3.
- * Note that this means if multiple parties are simultaneously writing to the
- * same object, they may all get a successful response even though only
- * one of them wins in the end. This is because S3 is a distributed system
- * and it may take a few seconds for one part of the system to realize
- * that another part has received an object update.
- * In this release of Amazon S3, there is no ability to lock an object for
- * writing -- such functionality, if required, should be provided
- * at the application layer.
- *
+ * The PUT request operation is used to add an object to a bucket. The response
+ * indicates that the object has been successfully stored. S3 never stores
+ * partial objects: if you receive a successful response, then you can be
+ * confident that the entire object was stored. If the object already exists in
+ * the bucket, the new object overwrites the existing object. S3 orders all of
+ * the requests that it receives. it is possible that if you send two requests
+ * nearly simultaneously, we will receive them in a different order than they
+ * were sent. The last request received is the one which is stored in S3. Note
+ * that this means if multiple parties are simultaneously writing to the same
+ * object, they may all get a successful response even though only one of them
+ * wins in the end. This is because S3 is a distributed system and it may take a
+ * few seconds for one part of the system to realize that another part has
+ * received an object update. In this release of Amazon S3, there is no ability
+ * to lock an object for writing -- such functionality, if required, should be
+ * provided at the application layer.
+ * 
  * @author pcarion
  */
 public class ObjectPUT extends BaseS3Operation {
@@ -51,12 +49,21 @@ public class ObjectPUT extends BaseS3Operation {
     }
 
     public boolean execute() throws IOException {
-        return execute(null, null);
+        return execute(null, null, null);
     }
 
-    public boolean execute(ByteBuffer content, String contentType) throws IOException {
+    public boolean execute(ByteBuffer content, String contentType)
+            throws IOException {
+        return execute(content, contentType, null);
+    }
+
+    public boolean execute(ByteBuffer content, String contentType,
+            UploadNotification notify) throws IOException {
         S3Request X = S3Request.mkPutRequest(_uri);
         if (content != null) {
+            if (notify != null) {
+                X.setUploadNotification(notify);
+            }
             X.setContent(content, contentType);
         }
         return process(X);

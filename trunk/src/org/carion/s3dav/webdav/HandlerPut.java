@@ -20,10 +20,12 @@ import java.io.IOException;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 /**
  * Handles 'PUT' request
- *
+ * 
  * @author pcarion
  */
 public class HandlerPut extends HandlerBase {
@@ -31,31 +33,31 @@ public class HandlerPut extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         S3UrlName url = request.getUrl();
 
         if (_repository.objectExists(url)) {
             if (_repository.isFolder(url)) {
-                response.setResponseStatus(WebdavResponse.SC_FORBIDDEN);
+                response.setResponseStatus(HttpResponse.SC_FORBIDDEN);
             } else {
                 S3Resource res = _repository.getResource(url);
                 res.setResourceContent(request.getInputStream(), request
                         .getContentType(), request.getContentLength());
-                response.setResponseStatus(WebdavResponse.SC_CREATED);
+                response.setResponseStatus(HttpResponse.SC_CREATED);
             }
         } else {
             S3UrlName parent = url.getParent();
             if (parent != null) {
                 if (!_repository.isFolder(parent)) {
-                    response.setResponseStatus(WebdavResponse.SC_CONFLICT);
+                    response.setResponseStatus(HttpResponse.SC_CONFLICT);
                     return;
                 }
             }
             S3Resource res = _repository.createResource(url);
             res.setResourceContent(request.getInputStream(), request
                     .getContentType(), request.getContentLength());
-            response.setResponseStatus(WebdavResponse.SC_CREATED);
+            response.setResponseStatus(HttpResponse.SC_CREATED);
         }
     }
 }

@@ -23,14 +23,14 @@ import org.carion.s3.S3Object;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
 import org.carion.s3.util.Util;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.webdav.WebdavRequest;
 
 public class BrowserPage {
     private final HtmlWriter _w = new HtmlWriter();
 
-    public String getFolderHtmlPage(S3Folder folder, WebdavRequest request,
+    public String getFolderHtmlPage(S3Folder folder, HttpRequest request,
             S3Repository repository) throws IOException {
         String theUri = folder.getUrl().getUri();
         _w.header("Directory:" + theUri);
@@ -113,7 +113,7 @@ public class BrowserPage {
         return _w.toString();
     }
 
-    private String mkUrl(S3Object res, WebdavRequest request) {
+    private String mkUrl(S3Object res, HttpRequest request) {
         return "http://" + request.getHost() + res.getUrl().getUri();
     }
 

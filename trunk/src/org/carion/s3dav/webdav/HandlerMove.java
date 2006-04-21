@@ -19,10 +19,12 @@ import java.io.IOException;
 
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 /**
  * Handles 'MOVE' request.
- *
+ * 
  * @author pcarion
  */
 public class HandlerMove extends HandlerBase {
@@ -30,13 +32,13 @@ public class HandlerMove extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         boolean overwrite = request.getOverwrite();
         S3UrlName destination = request.getDestination();
 
         if (destination == null) {
-            response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
+            response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -52,13 +54,13 @@ public class HandlerMove extends HandlerBase {
                 // if something wrong afterwards ... the content is lost !
                 _repository.deleteObject(destination);
             } else {
-                response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
+                response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
                 return;
             }
         }
         _repository.copy(request.getUrl(), destination);
         _repository.deleteObject(request.getUrl());
 
-        response.setResponseStatus(WebdavResponse.SC_CREATED);
+        response.setResponseStatus(HttpResponse.SC_CREATED);
     }
 }

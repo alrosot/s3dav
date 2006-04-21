@@ -80,6 +80,8 @@ public class S3Request {
 
     private String _contentMd5 = null;
 
+    private UploadNotification _notify = null;
+
     private final static SimpleDateFormat _httpDateFormat;
 
     static {
@@ -95,6 +97,10 @@ public class S3Request {
         _method = method;
         _path = path;
         _httpDate = date;
+    }
+
+    void setUploadNotification(UploadNotification notify) {
+        _notify = notify;
     }
 
     void setContent(ByteBuffer content, String contentType, String contentMd5) {
@@ -193,6 +199,15 @@ public class S3Request {
                 byte[] data = new byte[1024];
                 while ((len = in.read(data)) >= 0) {
                     dataout.write(data, 0, len);
+                    if (_notify != null) {
+                        if (!_notify.ntfUploaded(len)) {
+                            try {
+                                dataout.close();
+                            } catch (Exception ex) {
+                            }
+                            throw new IOException("upload aborted");
+                        }
+                    }
                 }
                 dataout.close();
             }
@@ -208,8 +223,10 @@ public class S3Request {
                 if (key == null) {
                     // Warning: javadoc for getHeaderFieldKey:
                     // Returns the key for the nth header field.
-                    // Some implementations may treat the 0th header field as special,
-                    // i.e. as the status line returned by the HTTP server. In this
+                    // Some implementations may treat the 0th header field as
+                    // special,
+                    // i.e. as the status line returned by the HTTP server. In
+                    // this
                     // case, getHeaderField(0) returns the status line, but
                     // getHeaderFieldKey(0) returns null.
                     if (i > 0) {
@@ -229,9 +246,12 @@ public class S3Request {
 
             // 2xx response codes are ok, everything else is an error
             if (responseCode / 100 != 2) {
-                InputStream in = Util.wrap(conn.getErrorStream(), false, conn
-                        .getContentLength());
-                String error = Util.readInputStreamAsString(in);
+                String error = "";
+                if (conn.getErrorStream() != null) {
+                    InputStream in = Util.wrap(conn.getErrorStream(), false,
+                            conn.getContentLength());
+                    error = Util.readInputStreamAsString(in);
+                }
                 S3Error errorResponse;
                 if ("application/xml".equals(contentType)
                         && (error.length() > 2)) {
@@ -358,11 +378,16 @@ public class S3Request {
 
     /**
      * Calculate the HMAC/SHA1 on a string.
-     * @param data Data to sign
-     * @param passcode Passcode to sign it with
+     * 
+     * @param data
+     *            Data to sign
+     * @param passcode
+     *            Passcode to sign it with
      * @return Signature
-     * @throws NoSuchAlgorithmException If the algorithm does not exist.  Unlikely
-     * @throws InvalidKeyException If the key is invalid.
+     * @throws NoSuchAlgorithmException
+     *             If the algorithm does not exist. Unlikely
+     * @throws InvalidKeyException
+     *             If the key is invalid.
      */
     String hmacSha1(String awsSecretAccessKey, String canonicalString) {
         // Acquire an HMAC/SHA1 from the raw key bytes.

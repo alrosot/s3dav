@@ -27,7 +27,7 @@ class LogsPage extends Page {
     void page() {
         _w.article("Logs");
         _w.out("<code><pre>");
-        _w.out(_repository.getRawLogs());
+        _w.out(_logWriter.getRawLogs());
         _w.out("</pre></code>");
         _w.article_end();
     }

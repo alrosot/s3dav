@@ -15,16 +15,18 @@
  */
 package org.carion.s3.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.carion.s3.Credential;
-import org.carion.s3.S3Log;
 import org.carion.s3.S3Folder;
+import org.carion.s3.S3Log;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
+import org.carion.s3.S3UploadManager;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.operations.BucketDELETE;
 import org.carion.s3.operations.BucketGET;
@@ -37,27 +39,18 @@ import org.carion.s3.operations.ServiceGET;
 import org.carion.s3.util.Util;
 
 /*
-
- Let's consider this file system
- /a/f.txt
- /a/b/x1
- /a/b/x2
- /a/b/x3
- /a/b/x4
- /a/b/x5
-
- If we check the content of /a we will get 6 items !
-
- /a//f.txt
- /a//b
-
- /a/b//
- /a/b//x1
- /a/b//x2
- /a/b//x3
-
- If we check the content of /a// , we get 2 items
-
+ * 
+ * Let's consider this file system /a/f.txt /a/b/x1 /a/b/x2 /a/b/x3 /a/b/x4
+ * /a/b/x5
+ * 
+ * If we check the content of /a we will get 6 items !
+ * 
+ * /a//f.txt /a//b
+ * 
+ * /a/b// /a/b//x1 /a/b//x2 /a/b//x3
+ * 
+ * If we check the content of /a// , we get 2 items
+ * 
  */
 public class S3RepositoryImpl implements S3Repository {
     private Credential _credential;
@@ -66,30 +59,35 @@ public class S3RepositoryImpl implements S3Repository {
 
     private final Cache _s3ObjectCache;
 
+    private final S3UploadManager _uploadManager;
+
     private List _buckets = null;
 
-    public S3RepositoryImpl(Credential credential, S3Log log) {
+    public S3RepositoryImpl(Credential credential, File uploadDirectory,
+            S3Log log) {
         _credential = credential;
         _log = log;
         _s3ObjectCache = new Cache(32);
+
+        _uploadManager = new S3UploadManagerImpl(this, uploadDirectory);
     }
 
     public S3Log getLog() {
         return _log;
     }
 
-    public String getRawLogs() {
-        return _log.getRawLogs();
-    }
-
     public boolean isAvailable() {
         return _credential.isAccessAllowed();
     }
 
+    public S3UploadManager getUploadmanager() {
+        return _uploadManager;
+    }
+
     /**
-     * This method is called by the HTML admin page when the user
-     * enters his account information
-     *
+     * This method is called by the HTML admin page when the user enters his
+     * account information
+     * 
      * @param key
      * @param secret
      */
@@ -315,13 +313,13 @@ public class S3RepositoryImpl implements S3Repository {
         }
     }
 
-    //    public String getParentUri(String uri) throws IOException {
+    // public String getParentUri(String uri) throws IOException {
     // when trying to get the parent URI, we consider that the
     // following URI is already encoded, so no need to
     // reencode the parent URI
-    //        ResourceName name = new ResourceName(uri, false);
-    //        return name.getParentUri();
-    //    }
+    // ResourceName name = new ResourceName(uri, false);
+    // return name.getParentUri();
+    // }
 
     public void copy(S3UrlName source, S3UrlName destination)
             throws IOException {
@@ -336,8 +334,7 @@ public class S3RepositoryImpl implements S3Repository {
         }
     }
 
-    private void copyDirectory(S3Folder src, S3Folder dest)
-            throws IOException {
+    private void copyDirectory(S3Folder src, S3Folder dest) throws IOException {
         S3UrlName[] children = src.getChildrenUris();
 
         _log.log("Copy directory from: (" + src.getUrl().getUri() + ") to ("

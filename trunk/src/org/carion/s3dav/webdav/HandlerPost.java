@@ -18,36 +18,23 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3.S3Repository;
-import org.carion.s3.S3UrlName;
-import org.carion.s3.util.Util;
-import org.carion.s3dav.webdav.htmlPages.AdminPage;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 /**
  * Handles 'POST' request.
- *
+ * 
  * @author pcarion
- *
+ * 
  */
 public class HandlerPost extends HandlerBase {
     HandlerPost(S3Repository repository) {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
-        S3UrlName href = request.getUrl();
-
-        // catch request to admin pages
-        if (href.getUri().startsWith("/index.html")) {
-            AdminPage page = new AdminPage(request, _repository);
-            String body = page.getHtmlPage();
-
-            response.setResponseHeader("last-modified", Util.getHttpDate());
-
-            response.setResponseBody(body, "text/html");
-        } else {
-            response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
-        }
+        response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
     }
 
 }

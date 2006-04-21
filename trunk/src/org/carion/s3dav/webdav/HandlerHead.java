@@ -17,18 +17,18 @@ package org.carion.s3dav.webdav;
 
 import java.io.IOException;
 
-import org.carion.s3.S3Folder;
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
-import org.carion.s3.util.Util;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 public class HandlerHead extends HandlerGet {
     HandlerHead(S3Repository repository) {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         S3UrlName href = request.getUrl();
 
@@ -37,22 +37,13 @@ public class HandlerHead extends HandlerGet {
             boolean isDirectory = _repository.isFolder(href);
 
             if (isDirectory) {
-                S3Folder folder = _repository.getFolder(href);
-
-                response.setResponseHeader("last-modified", Util.getHttpDate());
-
-                String body = getFolderHtmlPage(folder, request);
-
-                response.setResponseHeader("Content-Length", String
-                        .valueOf(body.length()));
-
-                response.setResponseHeader("Content-Type", "text/html");
+                response.setResponseStatus(HttpResponse.SC_FORBIDDEN);
             } else {
                 S3Resource resource = _repository.getResource(href);
                 setHeaders(resource, response);
             }
         } else {
-            response.setResponseStatus(WebdavResponse.SC_NOT_FOUND);
+            response.setResponseStatus(HttpResponse.SC_NOT_FOUND);
         }
     }
 
