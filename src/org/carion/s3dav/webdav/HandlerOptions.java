@@ -19,13 +19,15 @@ import java.io.IOException;
 
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 public class HandlerOptions extends HandlerBase {
     HandlerOptions(S3Repository repository) {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         S3UrlName href = request.getUrl();
         StringBuffer options = new StringBuffer();

@@ -18,10 +18,12 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3.S3Repository;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 /**
  * Handles unsupported request
- *
+ * 
  * @author pcarion
  */
 public class HandlerUnsupported extends HandlerBase {
@@ -29,8 +31,8 @@ public class HandlerUnsupported extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
-        response.setResponseStatus(WebdavResponse.SC_BAD_REQUEST);
+        response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
     }
 }

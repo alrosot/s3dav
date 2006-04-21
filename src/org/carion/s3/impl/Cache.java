@@ -21,10 +21,8 @@ import java.util.Map;
 import org.carion.s3.operations.ObjectHEAD;
 
 /**
- * A LRU cache using a LinkedHashMap
- * see:
- * http://www.source-code.biz/snippets/java/6.htm
- * or
+ * A LRU cache using a LinkedHashMap see:
+ * http://www.source-code.biz/snippets/java/6.htm or
  * http://javaalmanac.com/egs/java.util/coll_Cache.html
  */
 public class Cache {

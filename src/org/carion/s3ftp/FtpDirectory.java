@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2006, Pierre Carion.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.carion.s3ftp;
 
 import java.io.BufferedInputStream;
@@ -20,7 +35,10 @@ public class FtpDirectory {
 
     private final S3Repository _repository;
 
-    private final static SimpleDateFormat _formatter = new SimpleDateFormat(
+    private final static SimpleDateFormat _formatterRecent = new SimpleDateFormat(
+            "MMM dd HH:mm");
+
+    private final static SimpleDateFormat _formatterOld = new SimpleDateFormat(
             "MMM dd yyyy");
 
     FtpDirectory(S3Repository repository) {
@@ -150,8 +168,12 @@ public class FtpDirectory {
             return _isDirectory;
         }
 
-        public String getFtpDate() {
-            return _formatter.format(_date);
+        public String getFtpDate(Date sixMonthsAgo) {
+            if (_date.before(sixMonthsAgo)) {
+                return _formatterOld.format(_date);
+            } else {
+                return _formatterRecent.format(_date);
+            }
         }
     }
 

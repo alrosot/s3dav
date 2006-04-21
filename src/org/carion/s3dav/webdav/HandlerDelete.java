@@ -19,10 +19,12 @@ import java.io.IOException;
 
 import org.carion.s3.S3Repository;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.http.HttpRequest;
+import org.carion.s3.http.HttpResponse;
 
 /**
  * Handles 'DELETE' request
- *
+ * 
  * @author pcarion
  */
 public class HandlerDelete extends HandlerBase {
@@ -30,15 +32,15 @@ public class HandlerDelete extends HandlerBase {
         super(repository);
     }
 
-    void process(WebdavRequest request, WebdavResponse response)
+    public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         S3UrlName url = request.getUrl();
 
         if (_repository.objectExists(url)) {
             _repository.deleteObject(url);
-            response.setResponseStatus(WebdavResponse.SC_OK);
+            response.setResponseStatus(HttpResponse.SC_OK);
         } else {
-            response.setResponseStatus(WebdavResponse.SC_OK);
+            response.setResponseStatus(HttpResponse.SC_OK);
         }
 
     }

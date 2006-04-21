@@ -15,30 +15,18 @@
  */
 package org.carion.s3dav.webdav;
 
-import java.io.IOException;
-
 import org.carion.s3.S3Repository;
+import org.carion.s3.http.HttpProcessing;
 
 /**
- * Abstract class which defines the contract that any handler
- * must fulfill.
- *
+ * Abstract class which defines the contract that any handler must fulfill.
+ * 
  * @author pcarion
  */
-public abstract class HandlerBase {
+public abstract class HandlerBase implements HttpProcessing {
     protected final S3Repository _repository;
 
     protected HandlerBase(S3Repository repository) {
         _repository = repository;
     }
-
-    /**
-     * Process the incoming request
-     * @param context allows the handler to retrieve informatio  about the context of execution
-     * @param response used by the handler to define the answer to send back to the client
-     * @throws IOException
-     */
-    abstract void process(WebdavRequest request, WebdavResponse response)
-            throws IOException;
-
 }

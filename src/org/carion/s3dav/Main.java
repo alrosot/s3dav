@@ -19,7 +19,6 @@ import java.io.File;
 
 import org.carion.s3.Credential;
 import org.carion.s3.S3Log;
-import org.carion.s3.S3Repository;
 import org.carion.s3.admin.AdminServer;
 import org.carion.s3.impl.CredentialFactory;
 import org.carion.s3.impl.S3RepositoryImpl;
@@ -54,12 +53,19 @@ public class Main {
 
             // 2) Initialize s3 repository access
             Credential credential = CredentialFactory.getCredential();
-            S3Repository repository = new S3RepositoryImpl(credential, log
-                    .getLogger(">s3>"));
+
+            File uploadDir = new File(s3DavDir, "upload");
+            if (!uploadDir.isDirectory() && !uploadDir.mkdirs()) {
+                throw new RuntimeException("Can't create directory:"
+                        + uploadDir);
+            }
+
+            S3RepositoryImpl repository = new S3RepositoryImpl(credential,
+                    uploadDir, log.getLogger(">s3>"));
 
             // 3) Initialize admin server
             AdminServer adminServer = new AdminServer(ADMINSERVER_PORT,
-                    repository, log.getLogger(">admin>"));
+                    repository, logWriter, repository.getUploadmanager(), log.getLogger(">admin>"));
             adminServer.start();
 
             // 4) Initialize s3DAV server

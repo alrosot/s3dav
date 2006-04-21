@@ -22,21 +22,24 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.carion.s3.S3Repository;
+import org.carion.s3.http.HttpRequest;
 import org.carion.s3.impl.S3RepositoryImpl;
+import org.carion.s3.util.LogWriter;
 import org.carion.s3dav.Version;
-import org.carion.s3dav.webdav.WebdavRequest;
 
 /**
- * Spring shades
- * http://www.oswd.org/design/preview/id/1171
+ * Spring shades http://www.oswd.org/design/preview/id/1171
  * http://www.spectrum-research.com/V2/generators/tableframe.asp
+ * 
  * @author pcarion
- *
+ * 
  */
 public class AdminPage {
     private final S3RepositoryImpl _repository;
+    
+    private final LogWriter _logWriter;
 
-    private final WebdavRequest _request;
+    private final HttpRequest _request;
 
     private final HashMap _parameters = new HashMap();
 
@@ -55,9 +58,10 @@ public class AdminPage {
         _pages.add(new DeleteObjectPage("deleteobject"));
     }
 
-    public AdminPage(WebdavRequest request, S3Repository repository) {
+    public AdminPage(HttpRequest request, S3Repository repository, LogWriter logWriter) {
         _repository = (S3RepositoryImpl) repository;
         _request = request;
+        _logWriter = logWriter;
         try {
             _request.parseParameters(_parameters);
         } catch (IOException ex) {
@@ -81,7 +85,7 @@ public class AdminPage {
         if (thePage == null) {
             thePage = new WelcomePage("");
         }
-        thePage.setContext(_w, this, _repository);
+        thePage.setContext(_w, this, _repository, _logWriter);
         return thePage;
     }
 
