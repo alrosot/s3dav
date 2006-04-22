@@ -46,7 +46,7 @@ public class ServiceGET extends BaseS3Operation {
      */
     public List execute() throws IOException {
         // we want the buckets here
-        S3Request X = S3Request.mkGetRequest("/");
+        S3Request X = S3Request.mkGetRequest("/", _log);
         if (!process(X, false)) {
             throw new IOException("Can't get buckets");
         }

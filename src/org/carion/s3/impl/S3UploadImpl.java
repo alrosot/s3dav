@@ -35,6 +35,8 @@ public class S3UploadImpl implements S3UploadManager.Upload {
     private final File _file;
 
     private FileChannel _roChannel;
+    
+    private RandomAccessFile _randomAccessFile;
 
     private final S3UploadManagerImpl _manager;
 
@@ -92,11 +94,19 @@ public class S3UploadImpl implements S3UploadManager.Upload {
         }
     }
 
+    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154
+    // 
     public void close() {
         System.out.println("@@@ close:" + _file);
         try {
+            _randomAccessFile.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        try {
             _roChannel.close();
         } catch (Exception ex) {
+            ex.printStackTrace();
         }
         if (!_file.delete()) {
             System.out.println("@@@ can't close:" + _file);
@@ -138,7 +148,8 @@ public class S3UploadImpl implements S3UploadManager.Upload {
     }
 
     ByteBuffer getByteBuffer() throws IOException {
-        _roChannel = new RandomAccessFile(_file, "r").getChannel();
+        _randomAccessFile = new RandomAccessFile(_file, "r"); 
+        _roChannel = _randomAccessFile.getChannel();
         ByteBuffer roBuf = _roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
                 (int) _roChannel.size());
         return roBuf;

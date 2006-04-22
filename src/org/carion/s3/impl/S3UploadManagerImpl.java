@@ -44,27 +44,22 @@ public class S3UploadManagerImpl implements S3UploadManager {
             long length) throws IOException {
         ObjectPUT ope = _repository.mkObjectPUT(name.getResourceKey());
 
-        S3UploadImpl upload = new S3UploadImpl(name, _baseDirectory, _repository.getS3Cache(), this);
+        S3UploadImpl upload = new S3UploadImpl(name, _baseDirectory,
+                _repository.getS3Cache(), this);
 
-        try {
-            upload.loadContent(content, length);
+        upload.loadContent(content, length);
 
-            if (length > SIZE_LIMIT_ASYNCHRONOUS) {
-                _uploads.add(upload);
-                upload.asynchronousUpload(ope, contentType, _repository
-                        .getLog());
-            } else {
-                try {
-                    if (!ope.execute(upload.getByteBuffer(), contentType)) {
-                        throw new IOException("Can't PUT:"
-                                + name.getResourceKey());
-                    }
-                } finally {
-                    upload.close();
+        if (length > SIZE_LIMIT_ASYNCHRONOUS) {
+            _uploads.add(upload);
+            upload.asynchronousUpload(ope, contentType, _repository.getLog());
+        } else {
+            try {
+                if (!ope.execute(upload.getByteBuffer(), contentType)) {
+                    throw new IOException("Can't PUT:" + name.getResourceKey());
                 }
+            } finally {
+                upload.close();
             }
-        } finally {
-            content.close();
         }
     }
 
@@ -82,7 +77,6 @@ public class S3UploadManagerImpl implements S3UploadManager {
     void uploadDone(S3UploadImpl upload, int state) {
         if (state == S3UploadManager.Upload.STATE_FINISHED) {
             _uploads.remove(upload);
-            upload.close();
         }
     }
 }

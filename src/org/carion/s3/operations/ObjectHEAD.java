@@ -40,7 +40,7 @@ public class ObjectHEAD extends BaseS3Operation {
     }
 
     public boolean execute() throws IOException {
-        S3Request X = S3Request.mkHeadRequest(_uri);
+        S3Request X = S3Request.mkHeadRequest(_uri, _log);
         return process(X);
     }
 }

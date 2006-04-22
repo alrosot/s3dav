@@ -36,7 +36,7 @@ public class BucketPUT extends BaseS3Operation {
     }
 
     public boolean execute() throws IOException {
-        S3Request X = S3Request.mkPutRequest("/" + _bucket);
+        S3Request X = S3Request.mkPutRequest("/" + _bucket, _log);
         return process(X);
     }
 }

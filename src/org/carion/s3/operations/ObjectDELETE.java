@@ -36,7 +36,7 @@ public class ObjectDELETE extends BaseS3Operation{
     }
 
     public boolean execute() throws IOException {
-        S3Request X = S3Request.mkDeleteRequest(_uri);
+        S3Request X = S3Request.mkDeleteRequest(_uri, _log);
         return process(X);
     }
 }
