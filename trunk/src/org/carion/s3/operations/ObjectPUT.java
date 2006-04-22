@@ -59,7 +59,7 @@ public class ObjectPUT extends BaseS3Operation {
 
     public boolean execute(ByteBuffer content, String contentType,
             UploadNotification notify) throws IOException {
-        S3Request X = S3Request.mkPutRequest(_uri);
+        S3Request X = S3Request.mkPutRequest(_uri, _log);
         if (content != null) {
             if (notify != null) {
                 X.setUploadNotification(notify);

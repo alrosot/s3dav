@@ -38,6 +38,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.carion.s3.Credential;
+import org.carion.s3.S3Log;
 import org.carion.s3.util.Base64;
 import org.carion.s3.util.InputStreamObserver;
 import org.carion.s3.util.Util;
@@ -48,20 +49,20 @@ public class S3Request {
 
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
-    public static S3Request mkGetRequest(String path) {
-        return new S3Request("GET", path);
+    public static S3Request mkGetRequest(String path, S3Log log) {
+        return new S3Request("GET", path, log);
     }
 
-    public static S3Request mkPutRequest(String path) {
-        return new S3Request("PUT", path);
+    public static S3Request mkPutRequest(String path, S3Log log) {
+        return new S3Request("PUT", path, log);
     }
 
-    public static S3Request mkDeleteRequest(String path) {
-        return new S3Request("DELETE", path);
+    public static S3Request mkDeleteRequest(String path, S3Log log) {
+        return new S3Request("DELETE", path, log);
     }
 
-    public static S3Request mkHeadRequest(String path) {
-        return new S3Request("HEAD", path);
+    public static S3Request mkHeadRequest(String path, S3Log log) {
+        return new S3Request("HEAD", path, log);
     }
 
     private final String _method;
@@ -71,6 +72,8 @@ public class S3Request {
     private final String _httpDate;
 
     private final Map _metaInfos = new HashMap();
+
+    private final S3Log _log;
 
     private String _queryString = null;
 
@@ -89,14 +92,15 @@ public class S3Request {
         _httpDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    private S3Request(String method, String path) {
-        this(method, path, _httpDateFormat.format(new Date()) + "GMT");
+    private S3Request(String method, String path, S3Log log) {
+        this(method, path, _httpDateFormat.format(new Date()) + "GMT", log);
     }
 
-    S3Request(String method, String path, String date) {
+    S3Request(String method, String path, String date, S3Log log) {
         _method = method;
         _path = path;
         _httpDate = date;
+        _log = log;
     }
 
     void setUploadNotification(UploadNotification notify) {
@@ -197,17 +201,29 @@ public class S3Request {
                 InputStream in = mkInputStream(_content);
                 int len = 0;
                 byte[] data = new byte[1024];
+                _log.log("Starting copy of content");
                 while ((len = in.read(data)) >= 0) {
                     dataout.write(data, 0, len);
+                    dataout.flush();
                     if (_notify != null) {
                         if (!_notify.ntfUploaded(len)) {
                             try {
                                 dataout.close();
                             } catch (Exception ex) {
                             }
+                            try {
+                                in.close();
+                            } catch (Exception ex) {
+                            }
                             throw new IOException("upload aborted");
                         }
                     }
+                }
+                _log.log("@@ content copied over. Closing connection");
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    _log.log("Error closing inputstream", ex);
                 }
                 dataout.close();
             }
@@ -452,6 +468,9 @@ public class S3Request {
                 }
                 buf.get(bytes, off, len);
                 return len;
+            }
+
+            public void close() throws IOException {
             }
         };
     }

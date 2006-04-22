@@ -56,7 +56,7 @@ public class BucketGET extends BaseS3Operation {
      */
     public List execute(String prefix) throws IOException {
         for (String marker = null;;) {
-            S3Request X = S3Request.mkGetRequest("/" + _bucket);
+            S3Request X = S3Request.mkGetRequest("/" + _bucket, _log);
             X.setQueryString("prefix="
                     + prefix
                     + ((marker == null) ? "" : "&marker="

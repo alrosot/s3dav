@@ -43,7 +43,7 @@ public class ObjectGET extends BaseS3Operation {
     }
 
     public boolean execute() throws IOException {
-        S3Request X = S3Request.mkGetRequest(_uri);
+        S3Request X = S3Request.mkGetRequest(_uri, _log);
         return process(X, false);
     }
 }
