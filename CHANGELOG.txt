@@ -1,4 +1,10 @@
 ## Changelog
+### Release 0.7
+* FIX: fixes in the webDAV protocol implementation to pass the litmus tests
+  (http://www.webdav.org/neon/litmus/). litmus - WebDAV server protocol compliance test suite
+  The only tests which fail (3 on 41) are related to the PROPPATCH command: I've chosen not
+  to implement this command, as it's not needed to copy files into a S3 account.
+
 ### Release 0.6
 
 * FIX: change the InputStream management.

@@ -18,6 +18,7 @@ package org.carion.s3dav.webdav;
 import java.io.IOException;
 
 import org.carion.s3.S3Repository;
+import org.carion.s3.S3UrlName;
 import org.carion.s3.http.HttpRequest;
 import org.carion.s3.http.HttpResponse;
 import org.carion.s3.impl.S3UrlNameImpl;
@@ -36,23 +37,47 @@ public class HandlerCopy extends HandlerBase {
             throws IOException {
         boolean overwrite = request.getOverwrite();
         S3UrlNameImpl destination = request.getDestination();
+        boolean noContent = false;
 
         if (destination == null) {
             response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
             return;
         }
 
-        if (_repository.objectExists(destination)) {
+        if (destination.equals(request.getResourceName())) {
+            response.setResponseStatus(HttpResponse.SC_FORBIDDEN);
+            return;
+        }
+
+        boolean destinationExists = _repository.objectExists(destination);
+
+        _log.log("COPY from (" + request.getResourceName().getUri() + ") to ("
+                + destination.getUri() + ")");
+        _log.log("---- overwrite? " + overwrite + " destination exists? "
+                + destinationExists);
+
+        if (destinationExists) {
             if (overwrite) {
+                noContent = true;
                 _repository.deleteObject(destination);
             } else {
-                response.setResponseStatus(HttpResponse.SC_FORBIDDEN);
+                response.setResponseStatus(HttpResponse.SC_PRECONDITION_FAILED);
                 return;
+            }
+        } else {
+            // we must check that the parent directory exist
+            S3UrlName parent = destination.getParent();
+            if (parent != null) {
+                if (! _repository.objectExists(parent)) {
+                    response.setResponseStatus(HttpResponse.SC_CONFLICT);
+                    return;
+                }
             }
         }
         _repository.copy(request.getResourceName(), destination);
 
-        response.setResponseStatus(HttpResponse.SC_CREATED);
+        response.setResponseStatus(noContent ? HttpResponse.SC_NO_CONTENT
+                : HttpResponse.SC_CREATED);
     }
 
 }

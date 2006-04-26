@@ -70,8 +70,9 @@ public class HandlerPropfind extends HandlerBase {
             try {
                 parsePropfind(body);
             } catch (SAXException ex) {
-                ex.printStackTrace();
-                throw new IOException(ex.getMessage());
+                _log.log("Error parsing content",ex);
+                response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
+                return;
             }
         } else {
             _mode = MODE_ALL_PROPERTIES;

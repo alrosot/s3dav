@@ -110,6 +110,10 @@ public class FtpDirectory {
     }
 
     File getTempFile(String name) {
+        String fName = cleanupName(name);
+        if (fName.startsWith("/")) {
+        } else {
+        }
         return null;
     }
 
@@ -199,5 +203,20 @@ public class FtpDirectory {
         } else {
             return sb.toString();
         }
+    }
+
+    private String mkResourceName(String name) {
+        String fName = cleanupName(name);
+        String result;
+        if (fName.startsWith("/")) {
+            result = fName;
+        } else {
+            if (_name.equals("/")) {
+                result = "/" + fName;
+            } else {
+                result = _name + "/" + fName;
+            }
+        }
+        return result;
     }
 }

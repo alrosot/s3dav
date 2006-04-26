@@ -52,6 +52,11 @@ public class HandlerMkcol extends HandlerBase {
     public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         S3UrlName uri = request.getUrl();
+        
+        if (request.hasBody()) {
+            response.setResponseStatus(HttpResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+            return;
+        }
 
         if (_repository.objectExists(uri)) {
             response.setResponseStatus(HttpResponse.SC_METHOD_NOT_ALLOWED);

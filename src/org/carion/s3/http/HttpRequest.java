@@ -105,6 +105,21 @@ public class HttpRequest {
         return Util.readInputStreamAsString(_inputStream);
     }
 
+    public boolean hasBody() {
+        return getContentLength() > 0;
+        /*
+        try {
+            String body = getBodyAsString();
+            if ((body != null) && body.length() > 0) {
+                return true;
+            }
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
+        */
+    }
+
     public InputStream getInputStream() {
         return _inputStream;
     }
@@ -168,7 +183,7 @@ public class HttpRequest {
 
     /**
      * Destination is something like this: http://127.0.0.1:8070/pierre/a%26c
-     *
+     * 
      * @return
      */
     public S3UrlNameImpl getDestination() {

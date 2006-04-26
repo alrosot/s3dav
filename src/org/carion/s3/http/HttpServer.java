@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.Iterator;
 
 import org.carion.s3.S3Log;
@@ -41,7 +43,10 @@ public abstract class HttpServer extends Thread {
 
         try {
             _log.log("Listening on port:" + _port);
-            serversocket = new ServerSocket(_port);
+            //serversocket = new ServerSocket(_port);
+            serversocket = new ServerSocket();
+            SocketAddress sa = new InetSocketAddress("192.168.0.234",_port);
+            serversocket.bind(sa);
         } catch (Exception e) {
             _log.log("Can't listen on socket", e);
             return;
