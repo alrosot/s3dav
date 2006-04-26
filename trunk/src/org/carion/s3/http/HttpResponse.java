@@ -24,6 +24,8 @@ public class HttpResponse {
 
     public final static int SC_CREATED = 201;
 
+    public final static int SC_NO_CONTENT = 204;
+
     public final static int SC_MULTI_STATUS = 207;
 
     public final static int SC_BAD_REQUEST = 400;
@@ -55,6 +57,7 @@ public class HttpResponse {
         _statusMessages.put(new Integer(SC_NOT_FOUND), "Not Found");
         _statusMessages.put(new Integer(SC_BAD_REQUEST), "Bad Request");
         _statusMessages.put(new Integer(SC_OK), "OK");
+        _statusMessages.put(new Integer(SC_NO_CONTENT), "No Content");
         _statusMessages.put(new Integer(SC_MULTI_STATUS), "Multi-Status");
         _statusMessages.put(new Integer(SC_CREATED), "Created");
         _statusMessages.put(new Integer(SC_INTERNAL_ERROR),

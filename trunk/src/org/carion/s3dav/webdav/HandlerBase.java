@@ -15,6 +15,7 @@
  */
 package org.carion.s3dav.webdav;
 
+import org.carion.s3.S3Log;
 import org.carion.s3.S3Repository;
 import org.carion.s3.http.HttpProcessing;
 
@@ -25,8 +26,10 @@ import org.carion.s3.http.HttpProcessing;
  */
 public abstract class HandlerBase implements HttpProcessing {
     protected final S3Repository _repository;
+    protected final S3Log _log;
 
     protected HandlerBase(S3Repository repository) {
         _repository = repository;
+        _log = _repository.getLog();
     }
 }

@@ -80,6 +80,12 @@ public class WebdavServer extends HttpServer {
     }
 
     protected HttpProcessing getProcessing(HttpRequest request) {
+        String litmus = request.getHttpHeader("X-Litmus");
+        if (litmus != null) {
+            _log.log("**********");
+            _log.log("Litmus test:" + litmus);
+            _log.log("**********");
+        }
         // let's find a handler to process this request
         HandlerBase handler = (HandlerBase) _handlers.get(request.getMethod());
         return handler;

@@ -152,179 +152,65 @@ public class FtpConnection implements Runnable {
         try {
 
             if (ftpCommand.equalsIgnoreCase("USER")) {
-                try {
-                    user(st.nextToken());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("PASS")) {
-                try {
-                    pass(st.nextToken());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
+                user(st.nextToken());
+            } else if (ftpCommand.equalsIgnoreCase("PASS")) {
+                pass(st.nextToken());
             }
 
             if (!_isLoggedIn) {
                 output("530 Login incorrect");
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("PWD")
-                    || ftpCommand.equalsIgnoreCase("XPWD")) {
-                pwd();
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("SYST")) {
-                syst();
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("QUIT")) {
-                quit();
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("LIST")) {
-                list(false);
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("NLST")) {
-                list(true);
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("CDUP")) {
-                cdup();
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("CWD")) {
-                try {
+            } else {
+                if (ftpCommand.equalsIgnoreCase("PWD")
+                        || ftpCommand.equalsIgnoreCase("XPWD")) {
+                    pwd();
+                } else if (ftpCommand.equalsIgnoreCase("SYST")) {
+                    syst();
+                } else if (ftpCommand.equalsIgnoreCase("QUIT")) {
+                    quit();
+                } else if (ftpCommand.equalsIgnoreCase("LIST")) {
+                    list(false);
+                } else if (ftpCommand.equalsIgnoreCase("NLST")) {
+                    list(true);
+                } else if (ftpCommand.equalsIgnoreCase("CDUP")) {
+                    cdup();
+                } else if (ftpCommand.equalsIgnoreCase("CWD")) {
                     cwd(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("RETR")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("RETR")) {
                     retr(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("TYPE")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("TYPE")) {
                     type(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("STRU")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("STRU")) {
                     stru(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("MODE")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("MODE")) {
                     mode(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("STOR")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("STOR")) {
                     stor(allRemainingTokens(st).trim(), false);
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("APPE")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("APPE")) {
                     stor(allRemainingTokens(st).trim(), true);
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("PORT")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("PORT")) {
                     port(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("DELE")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("DELE")) {
                     dele(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("NOOP")) {
-                noop();
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("REST")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("NOOP")) {
+                    noop();
+                } else if (ftpCommand.equalsIgnoreCase("REST")) {
                     rest(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("RNFR")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("RNFR")) {
                     rnfr(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("RNTO")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("RNTO")) {
                     rnto(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("MKD")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("MKD")) {
                     mkd(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
-                }
-                return;
-            }
-
-            if (ftpCommand.equalsIgnoreCase("RMD")
-                    || ftpCommand.equalsIgnoreCase("XRMD")) {
-                try {
+                } else if (ftpCommand.equalsIgnoreCase("RMD")
+                        || ftpCommand.equalsIgnoreCase("XRMD")) {
                     rmd(allRemainingTokens(st).trim());
-                } catch (NoSuchElementException nse) {
+                } else {
+                    output("502 " + ftpCommand + " command not supported");
                 }
-                return;
             }
-            output("502 " + ftpCommand + " command not supported");
         } catch (Exception ex) {
             _log.log("Error processing:" + ftpCommand, ex);
             output("550 " + ftpCommand + " command failed");
-
         }
     }
 
@@ -566,7 +452,7 @@ public class FtpConnection implements Runnable {
      * This will STORe a file on the server. If the append argument is true this
      * method will APPEnd to the existing file.
      */
-    public void stor(String fileName, boolean append) {
+    public void stor(String fileName, boolean append) throws IOException {
         File saveFile = _directory.getTempFile(fileName);
         if (_inBinaryMode) {
             storI(saveFile, fileName, append);
@@ -578,9 +464,11 @@ public class FtpConnection implements Runnable {
             _directory.sendFile(saveFile, fileName);
             output("226 ASCII transfer complete");
         }
+        
     }
 
-    public void storI(File saveFile, String fileName, boolean append) {
+    public void storI(File saveFile, String fileName, boolean append)
+            throws IOException {
         BufferedInputStream incomingData = null;
         BufferedOutputStream diskFile = null;
         int byt = -1;
@@ -588,32 +476,26 @@ public class FtpConnection implements Runnable {
         Socket dataSocket = getDataConnection();
         output("150 Opening BINARY mode data connection to receive " + fileName);
 
-        try {
-            incomingData = new BufferedInputStream(dataSocket.getInputStream());
-            diskFile = new BufferedOutputStream(new FileOutputStream(saveFile,
-                    append));
+        incomingData = new BufferedInputStream(dataSocket.getInputStream());
+        diskFile = new BufferedOutputStream(new FileOutputStream(saveFile,
+                append));
 
-            byt = incomingData.read();
-            while (byt >= 0) {
-                if (byt >= 0) {
-                    diskFile.write(byt);
-                }
-                byt = incomingData.read();
+        byt = incomingData.read();
+        while (byt >= 0) {
+            if (byt >= 0) {
+                diskFile.write(byt);
             }
-
-            diskFile.flush();
-
-            diskFile.close();
-            incomingData.close();
-        } catch (Exception e) {
-            System.out
-                    .println("Error receiving file in BINARY format for STOR");
-            System.out.println(e);
-            return;
+            byt = incomingData.read();
         }
+
+        diskFile.flush();
+
+        diskFile.close();
+        incomingData.close();
     }
 
-    public void storA(File saveFile, String fileName, boolean append) {
+    public void storA(File saveFile, String fileName, boolean append)
+            throws IOException {
         BufferedReader incomingData = null;
         PrintWriter diskFile = null;
         String line = null;
@@ -621,28 +503,22 @@ public class FtpConnection implements Runnable {
         Socket listSocket = getDataConnection();
         output("150 Opening ASCII mode data connection to receive " + fileName);
 
-        try {
-            incomingData = new BufferedReader(new InputStreamReader(listSocket
-                    .getInputStream()));
-            diskFile = new PrintWriter(new FileOutputStream(saveFile, append));
+        incomingData = new BufferedReader(new InputStreamReader(listSocket
+                .getInputStream()));
+        diskFile = new PrintWriter(new FileOutputStream(saveFile, append));
 
-            line = incomingData.readLine();
-            while (line != null) {
-                if (line != null) {
-                    diskFile.println(line);
-                }
-                line = incomingData.readLine();
+        line = incomingData.readLine();
+        while (line != null) {
+            if (line != null) {
+                diskFile.println(line);
             }
-
-            diskFile.flush();
-
-            diskFile.close();
-            incomingData.close();
-        } catch (Exception e) {
-            System.out.println("Error receiving file in ASCII format for STOR");
-            System.out.println(e);
-            return;
+            line = incomingData.readLine();
         }
+
+        diskFile.flush();
+
+        diskFile.close();
+        incomingData.close();
     }
 
     public void port(String commandArgs) {

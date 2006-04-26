@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 public class LogWriter {
-    private final static long MAX_FILE_LOG_SIZE = 5000;
+    private final static long MAX_FILE_LOG_SIZE = 100000;
 
     private final boolean _toSystemOut;
 

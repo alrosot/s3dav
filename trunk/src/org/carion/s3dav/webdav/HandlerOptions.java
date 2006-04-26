@@ -37,7 +37,7 @@ public class HandlerOptions extends HandlerBase {
         if (exists) {
             boolean isDirectory = _repository.isFolder(href);
             options
-                    .append("OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPPATCH, COPY, MOVE, LOCK, UNLOCK, PROPFIND");
+                    .append("OPTIONS, GET, HEAD, POST, DELETE, TRACE, COPY, MOVE, LOCK, UNLOCK, PROPFIND");
             if (isDirectory) {
                 options.append(", PUT");
             }

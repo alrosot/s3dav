@@ -40,7 +40,7 @@ public class HandlerDelete extends HandlerBase {
             _repository.deleteObject(url);
             response.setResponseStatus(HttpResponse.SC_OK);
         } else {
-            response.setResponseStatus(HttpResponse.SC_OK);
+            response.setResponseStatus(HttpResponse.SC_NOT_FOUND);
         }
 
     }

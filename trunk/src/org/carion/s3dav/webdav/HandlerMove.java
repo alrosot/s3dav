@@ -35,6 +35,7 @@ public class HandlerMove extends HandlerBase {
     public void process(HttpRequest request, HttpResponse response)
             throws IOException {
         boolean overwrite = request.getOverwrite();
+        boolean noContent = false;
         S3UrlName destination = request.getDestination();
 
         if (destination == null) {
@@ -53,14 +54,26 @@ public class HandlerMove extends HandlerBase {
                 // WARNING: we should backup the content
                 // if something wrong afterwards ... the content is lost !
                 _repository.deleteObject(destination);
+                noContent = true;
             } else {
-                response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
+                response.setResponseStatus(HttpResponse.SC_PRECONDITION_FAILED);
                 return;
+            }
+        } else {
+            // we must check that the parent directory exist
+            S3UrlName parent = destination.getParent();
+            if (parent != null) {
+                if (! _repository.objectExists(parent)) {
+                    response.setResponseStatus(HttpResponse.SC_CONFLICT);
+                    return;
+                }
             }
         }
         _repository.copy(request.getUrl(), destination);
         _repository.deleteObject(request.getUrl());
 
-        response.setResponseStatus(HttpResponse.SC_CREATED);
+        response.setResponseStatus(noContent ? HttpResponse.SC_NO_CONTENT
+                : HttpResponse.SC_CREATED);
+        
     }
 }
