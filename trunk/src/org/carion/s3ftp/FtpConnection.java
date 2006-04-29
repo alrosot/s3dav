@@ -256,8 +256,8 @@ public class FtpConnection implements Runnable {
         endSession();
     }
 
-    public void cwd(String commandArgs) throws IOException {
-        if (_directory.setDirectory(commandArgs)) {
+    public void cwd(String directory) throws IOException {
+        if (_directory.setDirectory(directory)) {
             output("250 CWD command successfull");
         } else {
             output("550 CWD command failed");
@@ -284,13 +284,12 @@ public class FtpConnection implements Runnable {
         List children = _directory.getChildren();
 
         try {
+            OutputStream out = null;
+
+            out = dataSocket.getOutputStream();
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(out));
+
             if (children.size() > 0) {
-                OutputStream out = null;
-
-                out = dataSocket.getOutputStream();
-                PrintWriter writer = new PrintWriter(
-                        new OutputStreamWriter(out));
-
                 for (Iterator iter = children.iterator(); iter.hasNext();) {
                     FtpDirectory.Child child = (FtpDirectory.Child) iter.next();
 
@@ -309,9 +308,10 @@ public class FtpConnection implements Runnable {
                         }
                     }
                 }
-                writer.close();
-                dataSocket.close();
             }
+            writer.close();
+            out.close();
+            dataSocket.close();
             output("226 ASCII transfer complete");
         } catch (IOException ex) {
             _log.log("Can't list content of:" + _directory.getName(), ex);
