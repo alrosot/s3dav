@@ -60,7 +60,7 @@ public class S3ResourceImpl extends S3ObjectImpl implements S3Resource {
 
     public void setResourceContent(InputStream content, String contentType,
             long length) throws IOException {
-        S3UploadManager uploadManager = _repository.getUploadmanager();
+        S3UploadManager uploadManager = _repository.getUploadManager();
 
         uploadManager.upload(_name, content, contentType, length);
     }

@@ -17,7 +17,6 @@ package org.carion.s3;
 
 import java.io.IOException;
 
-
 public interface S3Repository {
     boolean isAvailable();
 
@@ -30,8 +29,6 @@ public interface S3Repository {
     boolean isFolder(S3UrlName resource) throws IOException;
 
     boolean isResource(S3UrlName resource) throws IOException;
-
-    //String getParentUri(S3UrlName resource) throws IOException;
 
     S3Folder createFolder(S3UrlName resource) throws IOException;
 

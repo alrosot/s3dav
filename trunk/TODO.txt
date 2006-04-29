@@ -1,6 +1,8 @@
 TODO:
 
-- add parameter in the command line to set the value of the ports
+X DONE: add parameter in the command line to set the value of the ports
 - finish the ftp protocol
 - don't use memory mapped file
 - test again with NetDrive
+- command line parameters to setup your credentials
+- tests on Mac
