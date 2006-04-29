@@ -19,6 +19,8 @@ import org.carion.s3dav.Version;
 import org.carion.s3dav.webdav.InternetInputStream;
 
 public abstract class HttpServer extends Thread {
+    private final static String BIND_ADDRESS = "127.0.0.1";
+
     private final int _port;
 
     protected final S3Repository _repository;
@@ -43,9 +45,9 @@ public abstract class HttpServer extends Thread {
 
         try {
             _log.log("Listening on port:" + _port);
-            //serversocket = new ServerSocket(_port);
+            // serversocket = new ServerSocket(_port);
             serversocket = new ServerSocket();
-            SocketAddress sa = new InetSocketAddress("192.168.0.234",_port);
+            SocketAddress sa = new InetSocketAddress(BIND_ADDRESS, _port);
             serversocket.bind(sa);
         } catch (Exception e) {
             _log.log("Can't listen on socket", e);

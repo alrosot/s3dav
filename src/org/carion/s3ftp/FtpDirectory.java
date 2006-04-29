@@ -19,6 +19,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +31,10 @@ import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.impl.S3UrlNameImpl;
+import org.carion.s3.util.MimeTypes;
+import org.carion.s3.util.Util;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FtpDirectory {
     private String _name;
@@ -101,43 +107,65 @@ public class FtpDirectory {
         return result;
     }
 
-    BufferedReader getReader(String name) {
-        return null;
-    }
-
-    BufferedInputStream getInputStream(String name) {
-        return null;
-    }
-
-    File getTempFile(String name) {
-        String fName = cleanupName(name);
-        if (fName.startsWith("/")) {
-        } else {
+    BufferedReader getReader(String name) throws IOException {
+        S3UrlName s3Name = mkResourceName(name);
+        if (!_repository.isResource(s3Name)) {
+            throw new IOException("Invalid file name:" + s3Name.getUri());
         }
-        return null;
+        S3Resource res = _repository.getResource(s3Name);
+        InputStream in = res.getContent();
+        return new BufferedReader(new InputStreamReader(in));
     }
 
-    void sendFile(File file, String name) {
+    BufferedInputStream getInputStream(String name) throws IOException {
+        S3UrlName s3Name = mkResourceName(name);
+        if (!_repository.isResource(s3Name)) {
+            throw new IOException("Invalid file name:" + s3Name.getUri());
+        }
+        S3Resource res = _repository.getResource(s3Name);
+        InputStream in = res.getContent();
+        return new BufferedInputStream(in);
     }
 
-    boolean delete(String name) {
+    void upload(String fileName, InputStream in) throws IOException {
+        S3UrlName s3Name = mkResourceName(fileName);
+        String contentType = MimeTypes.ext2mimeType(s3Name.getExt());
+        S3Resource resource = _repository.getResource(s3Name);
+        resource.setResourceContent(in, contentType, -1);
+    }
+
+    boolean delete(String name) throws IOException {
+        S3UrlName s3Name = mkResourceName(name);
+        if (!_repository.objectExists(s3Name)) {
+            return false;
+        }
+        _repository.deleteObject(s3Name);
         return true;
     }
 
-    boolean childExists(String name) {
-        return true;
+    boolean childExists(String name) throws IOException {
+        S3UrlName s3Name = mkResourceName(name);
+        return _repository.isResource(s3Name);
     }
 
     boolean renameChild(String from, String to) {
-        return true;
+        throw new NotImplementedException();
     }
 
-    boolean makeDirectory(String fileName) {
-        return true;
+    void makeDirectory(String fileName) throws IOException {
+        S3UrlName s3Name = mkResourceName(fileName);
+        _repository.createFolder(s3Name);
     }
 
-    boolean deleteDirectory(String fileName) {
-        return true;
+    boolean deleteDirectory(String fileName) throws IOException {
+        S3UrlName s3Name = mkResourceName(fileName);
+        if (_repository.isFolder(s3Name)) {
+            S3Folder folder = _repository.getFolder(s3Name);
+            folder.remove();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public class Child {
@@ -205,7 +233,7 @@ public class FtpDirectory {
         }
     }
 
-    private String mkResourceName(String name) {
+    private S3UrlName mkResourceName(String name) {
         String fName = cleanupName(name);
         String result;
         if (fName.startsWith("/")) {
@@ -217,6 +245,6 @@ public class FtpDirectory {
                 result = _name + "/" + fName;
             }
         }
-        return result;
+        return new S3UrlNameImpl(result, false);
     }
 }

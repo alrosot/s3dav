@@ -18,8 +18,6 @@ package org.carion.s3ftp;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -29,7 +27,6 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.carion.s3.S3Log;
@@ -155,57 +152,58 @@ public class FtpConnection implements Runnable {
                 user(st.nextToken());
             } else if (ftpCommand.equalsIgnoreCase("PASS")) {
                 pass(st.nextToken());
-            }
-
-            if (!_isLoggedIn) {
-                output("530 Login incorrect");
             } else {
-                if (ftpCommand.equalsIgnoreCase("PWD")
-                        || ftpCommand.equalsIgnoreCase("XPWD")) {
-                    pwd();
-                } else if (ftpCommand.equalsIgnoreCase("SYST")) {
-                    syst();
-                } else if (ftpCommand.equalsIgnoreCase("QUIT")) {
-                    quit();
-                } else if (ftpCommand.equalsIgnoreCase("LIST")) {
-                    list(false);
-                } else if (ftpCommand.equalsIgnoreCase("NLST")) {
-                    list(true);
-                } else if (ftpCommand.equalsIgnoreCase("CDUP")) {
-                    cdup();
-                } else if (ftpCommand.equalsIgnoreCase("CWD")) {
-                    cwd(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("RETR")) {
-                    retr(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("TYPE")) {
-                    type(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("STRU")) {
-                    stru(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("MODE")) {
-                    mode(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("STOR")) {
-                    stor(allRemainingTokens(st).trim(), false);
-                } else if (ftpCommand.equalsIgnoreCase("APPE")) {
-                    stor(allRemainingTokens(st).trim(), true);
-                } else if (ftpCommand.equalsIgnoreCase("PORT")) {
-                    port(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("DELE")) {
-                    dele(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("NOOP")) {
-                    noop();
-                } else if (ftpCommand.equalsIgnoreCase("REST")) {
-                    rest(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("RNFR")) {
-                    rnfr(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("RNTO")) {
-                    rnto(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("MKD")) {
-                    mkd(allRemainingTokens(st).trim());
-                } else if (ftpCommand.equalsIgnoreCase("RMD")
-                        || ftpCommand.equalsIgnoreCase("XRMD")) {
-                    rmd(allRemainingTokens(st).trim());
+
+                if (!_isLoggedIn) {
+                    output("530 Login incorrect");
                 } else {
-                    output("502 " + ftpCommand + " command not supported");
+                    if (ftpCommand.equalsIgnoreCase("PWD")
+                            || ftpCommand.equalsIgnoreCase("XPWD")) {
+                        pwd();
+                    } else if (ftpCommand.equalsIgnoreCase("SYST")) {
+                        syst();
+                    } else if (ftpCommand.equalsIgnoreCase("QUIT")) {
+                        quit();
+                    } else if (ftpCommand.equalsIgnoreCase("LIST")) {
+                        list(false);
+                    } else if (ftpCommand.equalsIgnoreCase("NLST")) {
+                        list(true);
+                    } else if (ftpCommand.equalsIgnoreCase("CDUP")) {
+                        cdup();
+                    } else if (ftpCommand.equalsIgnoreCase("CWD")) {
+                        cwd(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("RETR")) {
+                        retr(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("TYPE")) {
+                        type(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("STRU")) {
+                        stru(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("MODE")) {
+                        mode(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("STOR")) {
+                        stor(allRemainingTokens(st).trim());
+                        // } else if (ftpCommand.equalsIgnoreCase("APPE")) {
+                        // stor(allRemainingTokens(st).trim(), true);
+                    } else if (ftpCommand.equalsIgnoreCase("PORT")) {
+                        port(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("DELE")) {
+                        dele(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("NOOP")) {
+                        noop();
+                    } else if (ftpCommand.equalsIgnoreCase("REST")) {
+                        rest(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("RNFR")) {
+                        rnfr(allRemainingTokens(st).trim());
+                        // } else if (ftpCommand.equalsIgnoreCase("RNTO")) {
+                        // rnto(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("MKD")) {
+                        mkd(allRemainingTokens(st).trim());
+                    } else if (ftpCommand.equalsIgnoreCase("RMD")
+                            || ftpCommand.equalsIgnoreCase("XRMD")) {
+                        rmd(allRemainingTokens(st).trim());
+                    } else {
+                        output("502 " + ftpCommand + " command not supported");
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -321,15 +319,25 @@ public class FtpConnection implements Runnable {
         }
     }
 
-    public void retr(String commandArgs) {
-        if (_inBinaryMode) {
-            retrI(commandArgs);
+    public void type(String commandArgs) {
+        if (commandArgs.equalsIgnoreCase("I")) {
+            _inBinaryMode = true;
+            output("200 Type set to I");
         } else {
-            retrA(commandArgs);
+            _inBinaryMode = false;
+            output("200 Type set to A");
         }
     }
 
-    private void retrA(String fileName) {
+    public void retr(String fileName) throws IOException {
+        if (_inBinaryMode) {
+            retrI(fileName);
+        } else {
+            retrA(fileName);
+        }
+    }
+
+    private void retrA(String fileName) throws IOException {
         PrintWriter writer = null;
         BufferedReader dataStream = _directory.getReader(fileName);
         String line = null;
@@ -369,7 +377,7 @@ public class FtpConnection implements Runnable {
         output("226 ASCII transfer complete");
     }
 
-    private void retrI(String fileName) {
+    private void retrI(String fileName) throws IOException {
         BufferedOutputStream writer = null;
         BufferedInputStream dataStream = _directory.getInputStream(fileName);
         int byt = -1;
@@ -410,16 +418,6 @@ public class FtpConnection implements Runnable {
         output("226 BINARY transfer complete");
     }
 
-    public void type(String commandArgs) {
-        if (commandArgs.equalsIgnoreCase("I")) {
-            _inBinaryMode = true;
-            output("200 Type set to I");
-        } else {
-            _inBinaryMode = false;
-            output("200 Type set to A");
-        }
-    }
-
     public void stru(String commandArgs) {
         if (commandArgs.equalsIgnoreCase("F")) {
             output("200 Structure set to F");
@@ -452,73 +450,20 @@ public class FtpConnection implements Runnable {
      * This will STORe a file on the server. If the append argument is true this
      * method will APPEnd to the existing file.
      */
-    public void stor(String fileName, boolean append) throws IOException {
-        File saveFile = _directory.getTempFile(fileName);
+    public void stor(String fileName) throws IOException {
+        Socket dataSocket = getDataConnection();
+        output("150 Opening BINARY mode data connection to receive " + fileName);
+        BufferedInputStream incomingData = new BufferedInputStream(dataSocket
+                .getInputStream());
+        _directory.upload(fileName, incomingData);
+        incomingData.close();
+
         if (_inBinaryMode) {
-            storI(saveFile, fileName, append);
-            _directory.sendFile(saveFile, fileName);
             output("226 BINARY transfer complete");
 
         } else {
-            storA(saveFile, fileName, append);
-            _directory.sendFile(saveFile, fileName);
             output("226 ASCII transfer complete");
         }
-        
-    }
-
-    public void storI(File saveFile, String fileName, boolean append)
-            throws IOException {
-        BufferedInputStream incomingData = null;
-        BufferedOutputStream diskFile = null;
-        int byt = -1;
-
-        Socket dataSocket = getDataConnection();
-        output("150 Opening BINARY mode data connection to receive " + fileName);
-
-        incomingData = new BufferedInputStream(dataSocket.getInputStream());
-        diskFile = new BufferedOutputStream(new FileOutputStream(saveFile,
-                append));
-
-        byt = incomingData.read();
-        while (byt >= 0) {
-            if (byt >= 0) {
-                diskFile.write(byt);
-            }
-            byt = incomingData.read();
-        }
-
-        diskFile.flush();
-
-        diskFile.close();
-        incomingData.close();
-    }
-
-    public void storA(File saveFile, String fileName, boolean append)
-            throws IOException {
-        BufferedReader incomingData = null;
-        PrintWriter diskFile = null;
-        String line = null;
-
-        Socket listSocket = getDataConnection();
-        output("150 Opening ASCII mode data connection to receive " + fileName);
-
-        incomingData = new BufferedReader(new InputStreamReader(listSocket
-                .getInputStream()));
-        diskFile = new PrintWriter(new FileOutputStream(saveFile, append));
-
-        line = incomingData.readLine();
-        while (line != null) {
-            if (line != null) {
-                diskFile.println(line);
-            }
-            line = incomingData.readLine();
-        }
-
-        diskFile.flush();
-
-        diskFile.close();
-        incomingData.close();
     }
 
     public void port(String commandArgs) {
@@ -543,7 +488,7 @@ public class FtpConnection implements Runnable {
      * This method deletes the file named by the commandArgs string. The file
      * must be in the current directory (i.e. a child of the current object).
      */
-    public void dele(String fileName) {
+    public void dele(String fileName) throws IOException {
         _directory.delete(fileName);
         output("250 DELE command succeded, " + fileName + "deleted.");
     }
@@ -574,7 +519,7 @@ public class FtpConnection implements Runnable {
      * Set the filename from which we will be renaming. This is the first half
      * of the complete rename command.
      */
-    public void rnfr(String fileName) {
+    public void rnfr(String fileName) throws IOException {
         if (_directory.childExists(fileName)) {
             /**
              * Set the source name for a rename command
@@ -599,7 +544,7 @@ public class FtpConnection implements Runnable {
     /**
      * Create a directory below the currently active directory.
      */
-    public void mkd(String fileName) {
+    public void mkd(String fileName) throws IOException {
         _directory.makeDirectory(fileName);
         output("257 Directory created");
     }
@@ -609,7 +554,7 @@ public class FtpConnection implements Runnable {
      * trim the path to its last element before passing it to the delete method
      * of the object.
      */
-    public void rmd(String fileName) {
+    public void rmd(String fileName) throws IOException {
         String fixedName = fileName;
 
         if (fileName.indexOf('\\') > 0) {
@@ -623,6 +568,7 @@ public class FtpConnection implements Runnable {
     }
 
     private void output(String out) {
+        _log.log("--> (" + out + ")");
         try {
             _output.println(out);
         } catch (Exception e) {

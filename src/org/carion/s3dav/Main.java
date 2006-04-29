@@ -28,13 +28,12 @@ import org.carion.s3dav.webdav.WebdavServer;
 import org.carion.s3ftp.FtpServer;
 
 public class Main {
-    private final static int ADMINSERVER_PORT = 8060;
-
-    private final static int WEBDAVSERVER_PORT = 8070;
-
-    private final static int FTPSERVER_PORT = 21;
 
     public static void main(String[] args) {
+        int adminServerPort = getPortValue(args, 0, 8060);
+        int webdavServerPort = getPortValue(args, 1, 8070);
+        int ftpServerPort = getPortValue(args, 2, 21);
+
         try {
             String userHome = System.getProperty("user.home");
             File s3DavDir = new File(userHome, "s3dav");
@@ -64,21 +63,46 @@ public class Main {
                     uploadDir, log.getLogger(">s3>"));
 
             // 3) Initialize admin server
-            AdminServer adminServer = new AdminServer(ADMINSERVER_PORT,
-                    repository, logWriter, repository.getUploadmanager(), log.getLogger(">admin>"));
-            adminServer.start();
+            if (adminServerPort > 0) {
+                AdminServer adminServer = new AdminServer(adminServerPort,
+                        repository, logWriter, repository.getUploadManager(),
+                        log.getLogger(">admin>"));
+                adminServer.start();
+            }
 
             // 4) Initialize s3DAV server
-            WebdavServer webdavServer = new WebdavServer(WEBDAVSERVER_PORT,
-                    repository, log.getLogger(">dav>"));
-            webdavServer.start();
+            if (webdavServerPort > 0) {
+                WebdavServer webdavServer = new WebdavServer(webdavServerPort,
+                        repository, log.getLogger(">dav>"));
+                webdavServer.start();
+            }
 
             // 5) Initialize ftp server
-            FtpServer ftpServer = new FtpServer("s3dav", "s3dav",
-                    FTPSERVER_PORT, repository, log.getLogger(">ftp>"));
-            ftpServer.start();
+            if (ftpServerPort > 0) {
+                FtpServer ftpServer = new FtpServer("s3dav", "s3dav",
+                        ftpServerPort, repository, log.getLogger(">ftp>"));
+                ftpServer.start();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static int getPortValue(String[] args, int numParam,
+            int defaultValue) {
+        int result = 0;
+
+        if (args.length >= (numParam + 1)) {
+            try {
+                result = Integer.parseInt(args[0]);
+            } catch (NumberFormatException ex) {
+                System.out.println("Invalid value for port number:(" + args[0]
+                        + ")");
+                System.exit(1);
+            }
+        } else {
+            result = defaultValue;
+        }
+        return result;
     }
 }

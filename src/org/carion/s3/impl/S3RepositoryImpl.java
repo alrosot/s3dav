@@ -80,7 +80,7 @@ public class S3RepositoryImpl implements S3Repository {
         return _credential.isAccessAllowed();
     }
 
-    public S3UploadManager getUploadmanager() {
+    public S3UploadManager getUploadManager() {
         return _uploadManager;
     }
     

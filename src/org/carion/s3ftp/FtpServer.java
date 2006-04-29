@@ -67,7 +67,7 @@ public class FtpServer extends Thread {
 
         _running = true;
 
-        _log.log("Port: " + _serverSocket.getLocalPort());
+        _log.log("Listening on port:" + _serverSocket.getLocalPort());
 
         while (_running) {
             try {
