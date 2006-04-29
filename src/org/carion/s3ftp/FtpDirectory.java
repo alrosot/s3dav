@@ -57,17 +57,9 @@ public class FtpDirectory {
     }
 
     boolean setDirectory(String directory) throws IOException {
-        String newDirectory = cleanupName(directory);
-        if (!newDirectory.startsWith("/")) {
-            if (_name.equals("/")) {
-                newDirectory = "/" + newDirectory;
-            } else {
-                newDirectory = _name + "/" + newDirectory;
-            }
-        }
-        S3UrlName name = new S3UrlNameImpl(newDirectory, false);
-        if (_repository.isFolder(name)) {
-            _name = newDirectory;
+        S3UrlName s3Name = mkResourceName(directory);
+        if (_repository.isFolder(s3Name)) {
+            _name = s3Name.getUri();
             return true;
         } else {
             return false;
@@ -226,7 +218,7 @@ public class FtpDirectory {
                 sb.append(c);
             }
         }
-        if (sb.charAt(sb.length() - 1) == '/') {
+        if ((sb.length() > 1) && (sb.charAt(sb.length() - 1) == '/')) {
             return sb.substring(0, sb.length() - 1);
         } else {
             return sb.toString();
