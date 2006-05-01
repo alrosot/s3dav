@@ -113,8 +113,17 @@ public class S3UploadImpl implements S3UploadManager.Upload {
         }
     }
 
-    void loadContent(InputStream in, long contentLength) throws IOException {
+    /**
+     * Copy the file in a temporary file in order to later transfer this file
+     * to S3
+     * @param in the stream containing the data to transfer 
+     * @param contentLength
+     * @return the actual length of the file to upload
+     * @throws IOException
+     */
+    long loadContent(InputStream in, long contentLength) throws IOException {
         FileOutputStream fos = null;
+        System.out.println("@@ upload file in temporary file:"+_file);
         try {
             fos = new FileOutputStream(_file);
             byte[] data = new byte[1024];
@@ -136,8 +145,9 @@ public class S3UploadImpl implements S3UploadManager.Upload {
             fos.flush();
             fos.close();
             fos = null;
-        } finally {
             _size = _file.length();
+            return _size;
+        } finally {
             if (fos != null) {
                 try {
                     fos.close();
