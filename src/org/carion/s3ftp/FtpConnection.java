@@ -535,7 +535,7 @@ public class FtpConnection implements Runnable {
      * Set the new name of the file we are about to rename, then actually rename
      * it. This is the second half of the rename command.
      */
-    public void rnto(String fileName) {
+    public void rnto(String fileName) throws IOException {
         _directory.renameChild(renameFrom, fileName);
         renameFrom = "";
         output("250 RNTO command succeded");

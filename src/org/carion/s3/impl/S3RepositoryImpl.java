@@ -53,6 +53,8 @@ import org.carion.s3.util.Util;
  * 
  */
 public class S3RepositoryImpl implements S3Repository {
+    private final File _s3DavDirectory;
+
     private Credential _credential;
 
     private final S3Log _log;
@@ -63,8 +65,9 @@ public class S3RepositoryImpl implements S3Repository {
 
     private List _buckets = null;
 
-    public S3RepositoryImpl(Credential credential, File uploadDirectory,
-            S3Log log) {
+    public S3RepositoryImpl(Credential credential, File s3DavDirectory,
+            File uploadDirectory, S3Log log) {
+        _s3DavDirectory = s3DavDirectory;
         _credential = credential;
         _log = log;
         _s3ObjectCache = new Cache(32);
@@ -83,7 +86,7 @@ public class S3RepositoryImpl implements S3Repository {
     public S3UploadManager getUploadManager() {
         return _uploadManager;
     }
-    
+
     public Cache getS3Cache() {
         return _s3ObjectCache;
     }
@@ -96,11 +99,12 @@ public class S3RepositoryImpl implements S3Repository {
      * @param secret
      */
     public void newCredentialInformation(String key, String secret) {
-        _credential = CredentialFactory.newCredential(key, secret);
+        _credential = CredentialFactory.newCredential(_s3DavDirectory, key,
+                secret);
     }
 
     public void deleteCredential() {
-        _credential = CredentialFactory.deleteCredential();
+        _credential = CredentialFactory.deleteCredential(_s3DavDirectory);
     }
 
     public String getAccessKey() {

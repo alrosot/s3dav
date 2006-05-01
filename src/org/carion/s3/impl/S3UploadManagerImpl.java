@@ -47,7 +47,8 @@ public class S3UploadManagerImpl implements S3UploadManager {
         S3UploadImpl upload = new S3UploadImpl(name, _baseDirectory,
                 _repository.getS3Cache(), this);
 
-        upload.loadContent(content, length);
+        length = upload.loadContent(content, length);
+        System.out.println("@@@ upload size:"+length);
 
         if (length > SIZE_LIMIT_ASYNCHRONOUS) {
             _uploads.add(upload);

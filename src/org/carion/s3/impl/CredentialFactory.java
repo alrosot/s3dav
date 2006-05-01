@@ -15,17 +15,18 @@
  */
 package org.carion.s3.impl;
 
+import java.io.File;
 import java.security.KeyStoreException;
 
 import org.carion.s3.Credential;
 import org.carion.s3.keymanagement.CredentialImpl;
 
 public class CredentialFactory {
-    public static Credential getCredential() {
+    public static Credential getCredential(File s3davDirectory) {
         Credential credential;
 
         try {
-            credential = new CredentialImpl();
+            credential = new CredentialImpl(s3davDirectory);
         } catch (KeyStoreException ex) {
             ex.printStackTrace();
             credential = new NoCredential();
@@ -33,11 +34,13 @@ public class CredentialFactory {
         return credential;
     }
 
-    public static Credential newCredential(String accessKey, String secretKey) {
+    public static Credential newCredential(File s3davDirectory,
+            String accessKey, String secretKey) {
         Credential credential;
 
         try {
-            credential = CredentialImpl.mkNewCredential(accessKey, secretKey);
+            credential = new CredentialImpl(s3davDirectory, accessKey,
+                    secretKey);
         } catch (KeyStoreException ex) {
             ex.printStackTrace();
             credential = new NoCredential();
@@ -46,8 +49,8 @@ public class CredentialFactory {
 
     }
 
-    public static Credential deleteCredential() {
-        CredentialImpl.deleteCredential();
+    public static Credential deleteCredential(File s3davDirectory) {
+        CredentialImpl.deleteCredential(s3davDirectory);
         return new NoCredential();
     }
 

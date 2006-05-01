@@ -17,7 +17,6 @@ package org.carion.s3ftp;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,9 +31,6 @@ import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.impl.S3UrlNameImpl;
 import org.carion.s3.util.MimeTypes;
-import org.carion.s3.util.Util;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FtpDirectory {
     private String _name;
@@ -140,8 +136,8 @@ public class FtpDirectory {
         return _repository.isResource(s3Name);
     }
 
-    boolean renameChild(String from, String to) {
-        throw new NotImplementedException();
+    boolean renameChild(String from, String to) throws IOException {
+        throw new IOException("rename child is not implemented");
     }
 
     void makeDirectory(String fileName) throws IOException {

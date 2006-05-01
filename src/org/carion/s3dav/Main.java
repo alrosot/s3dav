@@ -30,17 +30,23 @@ import org.carion.s3ftp.FtpServer;
 public class Main {
 
     public static void main(String[] args) {
+        String userHome = System.getProperty("user.home");
+        File s3DavDir = new File(userHome, "s3dav");
+        if (!s3DavDir.isDirectory() && !s3DavDir.mkdirs()) {
+            throw new RuntimeException("Can't create directory:" + s3DavDir);
+        }
+
+        // check if user wants to create credentials
+        if ((args.length == 3) && ("-x".equals(args[0].trim()))) {
+            createCredentials(s3DavDir, args[1], args[2]);
+            System.exit(0);
+        }
+
         int adminServerPort = getPortValue(args, 0, 8060);
         int webdavServerPort = getPortValue(args, 1, 8070);
         int ftpServerPort = getPortValue(args, 2, 21);
 
         try {
-            String userHome = System.getProperty("user.home");
-            File s3DavDir = new File(userHome, "s3dav");
-            if (!s3DavDir.isDirectory() && !s3DavDir.mkdirs()) {
-                throw new RuntimeException("Can't create directory:" + s3DavDir);
-            }
-
             // 1) Initialize log mechanism
             File logDir = new File(s3DavDir, "log");
             if (!logDir.isDirectory() && !logDir.mkdirs()) {
@@ -51,7 +57,7 @@ public class Main {
             log.log("s3DAV - version:" + Version.VERSION);
 
             // 2) Initialize s3 repository access
-            Credential credential = CredentialFactory.getCredential();
+            Credential credential = CredentialFactory.getCredential(s3DavDir);
 
             File uploadDir = new File(s3DavDir, "upload");
             if (!uploadDir.isDirectory() && !uploadDir.mkdirs()) {
@@ -60,7 +66,7 @@ public class Main {
             }
 
             S3RepositoryImpl repository = new S3RepositoryImpl(credential,
-                    uploadDir, log.getLogger(">s3>"));
+                    s3DavDir, uploadDir, log.getLogger(">s3>"));
 
             // 3) Initialize admin server
             if (adminServerPort > 0) {
@@ -94,15 +100,22 @@ public class Main {
 
         if (args.length >= (numParam + 1)) {
             try {
-                result = Integer.parseInt(args[0]);
+                result = Integer.parseInt(args[numParam]);
             } catch (NumberFormatException ex) {
-                System.out.println("Invalid value for port number:(" + args[0]
-                        + ")");
+                System.out.println("Invalid value for port number:("
+                        + args[numParam] + ")");
                 System.exit(1);
             }
         } else {
             result = defaultValue;
         }
         return result;
+    }
+
+    private static void createCredentials(File s3DavDir, String accessKey,
+            String secretKey) {
+        System.out.println("Credential creation ...");
+        CredentialFactory.newCredential(s3DavDir, accessKey, secretKey);
+        System.out.println("Credential created");
     }
 }
