@@ -16,8 +16,10 @@
 package org.carion.s3dav.webdav;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,7 +30,9 @@ import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.http.HttpRequest;
 import org.carion.s3.http.HttpResponse;
+import org.carion.s3.impl.UploadResource;
 import org.carion.s3.util.BaseXmlParser;
+import org.carion.s3.util.MimeTypes;
 import org.carion.s3.util.Util;
 import org.carion.s3.util.XMLWriter;
 import org.xml.sax.Attributes;
@@ -70,7 +74,7 @@ public class HandlerPropfind extends HandlerBase {
             try {
                 parsePropfind(body);
             } catch (SAXException ex) {
-                _log.log("Error parsing content",ex);
+                _log.log("Error parsing content", ex);
                 response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -82,14 +86,14 @@ public class HandlerPropfind extends HandlerBase {
             response.setResponseStatus(HttpResponse.SC_NOT_FOUND);
         } else {
             XMLWriter writer = response.getXMLWriter("multistatus");
-            process(writer, request.getDepth(), url);
+            process(writer, request.getDepth(), url, false);
             response.setResponseStatus(HttpResponse.SC_MULTI_STATUS);
         }
     }
 
-    private void process(XMLWriter writer, int depth, S3UrlName href)
-            throws IOException {
-        boolean isFolder = _repository.isFolder(href);
+    private void process(XMLWriter writer, int depth, S3UrlName href,
+            boolean isUpload) throws IOException {
+        boolean isFolder = isUpload ? false : _repository.isFolder(href);
         S3Folder folder = null;
 
         writer.opening("response");
@@ -99,16 +103,36 @@ public class HandlerPropfind extends HandlerBase {
             folder = _repository.getFolder(href);
             writeResourceProperties(writer, folder);
         } else {
-            S3Resource resource = _repository.getResource(href);
+            S3Resource resource;
+            if (isUpload) {
+                resource = new UploadResource(href);
+            } else {
+                resource = _repository.getResource(href);
+            }
             writeResourceProperties(writer, resource);
         }
         writer.closing("response");
 
         if (isFolder && (depth > 0)) {
+            List uploads = _repository.getUploadManager()
+                    .getUploadsInDirectory(folder.getUrl());
+            for (Iterator iter = uploads.iterator(); iter.hasNext();) {
+                S3UrlName uri = (S3UrlName) iter.next();
+                process(writer, depth - 1, uri, true);
+            }
             S3UrlName[] uris = folder.getChildrenUris();
             for (int i = 0; i < uris.length; i++) {
                 S3UrlName uri = uris[i];
-                process(writer, depth - 1, uri);
+                boolean found = false;
+                for (Iterator iter = uploads.iterator(); iter.hasNext();) {
+                    if (uri.isSameUri((S3UrlName) iter.next())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    process(writer, depth - 1, uri, false);
+                }
             }
         }
     }
@@ -283,4 +307,5 @@ public class HandlerPropfind extends HandlerBase {
             }
         }
     }
+
 }

@@ -16,23 +16,19 @@
 package org.carion.s3.operations;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
 /*
- * Here are a few links to sources which helped me debug
- * this implememtation
+ * Here are a few links to sources which helped me debug this implememtation
  * http://dev.w3.org/cvsweb/java/classes/org/w3c/tools/crypt/Md5.java?rev=1.5&content-type=text/x-cvsweb-markup
  * http://www.koders.com/java/fidEE625DA8C326622AFFD0294AB053CDD220542596.aspx
  * http://dll.nu/duper/MD5.java
- *
- * See also:
- * http://pajhome.org.uk/crypt/md5/md5src.html
+ * 
+ * See also: http://pajhome.org.uk/crypt/md5/md5src.html
  * http://www.zvon.org/tmRFC/RFC2202/Output/chapter7.html
  * http://www.jonh.net/~jonh/md5/MD5.java
-
+ * 
  */
 public class Md5 {
     private static final int S11 = 7;
@@ -80,15 +76,15 @@ public class Md5 {
             (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0,
             (byte) 0 };
 
-    private final ByteBuffer input;
-
     private final int state[];
 
     private long count = 0;
 
     private byte buffer[] = null;
 
-    //private byte digest[] = null;
+    private final File file;
+
+    // private byte digest[] = null;
 
     private final int F(int x, int y, int z) {
         return ((x & y) | ((~x) & z));
@@ -138,28 +134,19 @@ public class Md5 {
         return a;
     }
 
-    private final void decode(int output[], ByteBuffer inputBuffer, int off,
-            int len) {
-        byte[] input = new byte[len];
-        for (int i = 0; i < len; i++) {
-            input[i] = inputBuffer.get(off + i);
-        }
-
+    private final void decode(int output[], byte[] input, int off, int len) {
         int i = 0;
         int j = 0;
         for (; j < len; i++, j += 4) {
-            output[i] = (((int) (input[j] & 0xff))
-                    | (((int) (input[j + 1] & 0xff)) << 8)
-                    | (((int) (input[j + 2] & 0xff)) << 16) | (((int) (input[j + 3] & 0xff)) << 24));
+            output[i] = (((int) (input[off + j] & 0xff))
+                    | (((int) (input[off + j + 1] & 0xff)) << 8)
+                    | (((int) (input[off + j + 2] & 0xff)) << 16) | (((int) (input[off
+                    + j + 3] & 0xff)) << 24));
         }
     }
 
-    private final void transform(byte block[], int offset) {
-        transform(ByteBuffer.wrap(block), offset);
-    }
-
-    //    private final void transform2(byte block[], int offset) {
-    private final void transform(ByteBuffer block, int offset) {
+    // private final void transform2(byte block[], int offset) {
+    private final void transform(byte[] block, int offset) {
         int a = state[0];
         int b = state[1];
         int c = state[2];
@@ -245,20 +232,15 @@ public class Md5 {
         state[3] += d;
     }
 
+    // private final void update2(byte input[], int len) {
     private final void update(byte input[], int len) {
-        update(ByteBuffer.wrap(input, 0, len));
-    }
-
-    //    private final void update2(byte input[], int len) {
-    private final void update(ByteBuffer input) {
-        int len = input.remaining();
         int index = ((int) (count >> 3)) & 0x3f;
         count += (len << 3);
         int partLen = 64 - index;
         int i = 0;
         if (len >= partLen) {
             for (int i2 = 0; i2 < partLen; i2++) {
-                buffer[i2 + index] = input.get(i2);
+                buffer[i2 + index] = input[i2];
             }
             transform(buffer, 0);
             for (i = partLen; i + 63 < len; i += 64) {
@@ -271,7 +253,7 @@ public class Md5 {
 
         // remaining input
         for (int i2 = 0; i2 < len - i; i2++) {
-            buffer[index + i2] = input.get(i + i2);
+            buffer[index + i2] = input[i + i2];
         }
     }
 
@@ -305,7 +287,7 @@ public class Md5 {
      * Get the digest for our input stream. This method constructs the input
      * stream digest, and return it, as a a String, following the MD5 (rfc1321)
      * algorithm,
-     *
+     * 
      * @return An instance of String, giving the message digest.
      * @exception IOException
      *                Thrown if the digestifier was unable to read the input
@@ -317,20 +299,31 @@ public class Md5 {
         state[1] = 0xefcdab89;
         state[2] = 0x98badcfe;
         state[3] = 0x10325476;
-        update(input);
+
+        FileInputStream in = new FileInputStream(file);
+        byte[] data = new byte[1024];
+        long contentLength = file.length();
+        long tobeRead = contentLength;
+
+        while (tobeRead > 0) {
+            int len = in.read(data, 0, Math.min((int) tobeRead, data.length));
+            update(data, len);
+            tobeRead -= len;
+        }
+        in.close();
         return end();
     }
 
     /**
      * Construct a digestifier for the given string.
-     *
+     * 
      * @param input
      *            The string to be digestified.
      * @param encoding
      *            the encoding name used (such as UTF8)
      */
-    public Md5(ByteBuffer input) {
-        this.input = input;
+    public Md5(File file) {
+        this.file = file;
         this.state = new int[4];
         this.buffer = new byte[64];
         this.count = 0;
@@ -348,17 +341,13 @@ public class Md5 {
     }
 
     public static byte[] getDigest(File file) throws IOException {
-        // Create a read-only memory-mapped file
-        FileChannel roChannel = new RandomAccessFile(file, "r").getChannel();
-        ByteBuffer roBuf = roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
-                (int) roChannel.size());
-
-        Md5 md5 = new Md5(roBuf);
+        Md5 md5 = new Md5(file);
         return md5.getDigest();
     }
 
-    public static byte[] getDigest(ByteBuffer roBuf) throws IOException {
-        Md5 md5 = new Md5(roBuf);
-        return md5.getDigest();
+    public static void main(String[] args) throws Exception {
+        Md5 X = new Md5(new File("dist/s3DAV-0.7.jar"));
+        byte[] md5 = X.getDigest();
+        System.out.println("@@ (" + stringify(md5) + ")");
     }
 }

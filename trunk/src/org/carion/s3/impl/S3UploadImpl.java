@@ -16,27 +16,23 @@
 package org.carion.s3.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 
 import org.carion.s3.S3Log;
 import org.carion.s3.S3UploadManager;
 import org.carion.s3.S3UrlName;
+import org.carion.s3.operations.Md5;
 import org.carion.s3.operations.ObjectPUT;
 import org.carion.s3.operations.UploadNotification;
+import org.carion.s3.util.Base64;
 
 public class S3UploadImpl implements S3UploadManager.Upload {
     private final S3UrlName _name;
 
     private final File _file;
-
-    private FileChannel _roChannel;
-    
-    private RandomAccessFile _randomAccessFile;
 
     private final S3UploadManagerImpl _manager;
 
@@ -98,32 +94,24 @@ public class S3UploadImpl implements S3UploadManager.Upload {
     // 
     public void close() {
         System.out.println("@@@ close:" + _file);
-        try {
-            _randomAccessFile.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        try {
-            _roChannel.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
         if (!_file.delete()) {
             System.out.println("@@@ can't close:" + _file);
         }
     }
 
     /**
-     * Copy the file in a temporary file in order to later transfer this file
-     * to S3
-     * @param in the stream containing the data to transfer 
+     * Copy the file in a temporary file in order to later transfer this file to
+     * S3
+     * 
+     * @param in
+     *            the stream containing the data to transfer
      * @param contentLength
      * @return the actual length of the file to upload
      * @throws IOException
      */
     long loadContent(InputStream in, long contentLength) throws IOException {
         FileOutputStream fos = null;
-        System.out.println("@@ upload file in temporary file:"+_file);
+        System.out.println("@@ upload file in temporary file:" + _file);
         try {
             fos = new FileOutputStream(_file);
             byte[] data = new byte[1024];
@@ -155,14 +143,6 @@ public class S3UploadImpl implements S3UploadManager.Upload {
                 }
             }
         }
-    }
-
-    ByteBuffer getByteBuffer() throws IOException {
-        _randomAccessFile = new RandomAccessFile(_file, "r"); 
-        _roChannel = _randomAccessFile.getChannel();
-        ByteBuffer roBuf = _roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
-                (int) _roChannel.size());
-        return roBuf;
     }
 
     public void asynchronousUpload(ObjectPUT ope, String contentType, S3Log log) {
@@ -197,7 +177,13 @@ public class S3UploadImpl implements S3UploadManager.Upload {
         public void run() {
             try {
                 _state = STATE_STARTED;
-                if (!_ope.execute(getByteBuffer(), _contentType, this)) {
+
+                Md5 X = new Md5(_file);
+                String contentMd5 = Base64.encodeBytes(X.getDigest());
+                FileInputStream in = new FileInputStream(_file);
+
+                if (!_ope
+                        .execute(in, _contentType, contentMd5, getSize(), this)) {
                     throw new IOException("Can't PUT:" + _name.getResourceKey());
                 }
                 _state = STATE_FINISHED;

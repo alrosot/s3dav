@@ -77,11 +77,13 @@ public class S3Request {
 
     private String _queryString = null;
 
-    private ByteBuffer _content = null;
+    private InputStream _content = null;
 
     private String _contentType = null;
 
     private String _contentMd5 = null;
+
+    private long _contentLength = -1;
 
     private UploadNotification _notify = null;
 
@@ -107,29 +109,16 @@ public class S3Request {
         _notify = notify;
     }
 
-    void setContent(ByteBuffer content, String contentType, String contentMd5) {
-        _content = content;
-        _contentType = contentType;
-        _contentMd5 = contentMd5;
-    }
-
     public void setQueryString(String queryString) {
         _queryString = queryString;
     }
 
-    void setContent(ByteBuffer content, String contentType) {
-        String contentMd5;
-        if (content != null) {
-            try {
-                byte[] md5 = Md5.getDigest(content);
-                contentMd5 = Base64.encodeBytes(md5);
-            } catch (Exception e) {
-                throw new RuntimeException("unable to compute content-md5", e);
-            }
-        } else {
-            contentMd5 = null;
-        }
-        setContent(content, contentType, contentMd5);
+    void setContent(InputStream in, String contentMd5, String contentType,
+            long contentLength) {
+        _content = in;
+        _contentType = contentType;
+        _contentMd5 = contentMd5;
+        _contentLength = contentLength;
     }
 
     void addMetaInformation(String key, String value) {
@@ -179,7 +168,7 @@ public class S3Request {
 
             if (_content != null) {
                 conn.setRequestProperty("Content-Length", String
-                        .valueOf(_content.remaining()));
+                        .valueOf(_contentLength));
             } else {
                 conn.setRequestProperty("Content-Length", "0");
             }
@@ -198,11 +187,10 @@ public class S3Request {
 
             if (_content != null) {
                 OutputStream dataout = conn.getOutputStream();
-                InputStream in = mkInputStream(_content);
                 int len = 0;
                 byte[] data = new byte[1024];
                 _log.log("Starting copy of content");
-                while ((len = in.read(data)) >= 0) {
+                while ((len = _content.read(data)) >= 0) {
                     dataout.write(data, 0, len);
                     dataout.flush();
                     if (_notify != null) {
@@ -212,7 +200,7 @@ public class S3Request {
                             } catch (Exception ex) {
                             }
                             try {
-                                in.close();
+                                _content.close();
                             } catch (Exception ex) {
                             }
                             throw new IOException("upload aborted");
@@ -221,7 +209,7 @@ public class S3Request {
                 }
                 _log.log("@@ content copied over. Closing connection");
                 try {
-                    in.close();
+                    _content.close();
                 } catch (IOException ex) {
                     _log.log("Error closing inputstream", ex);
                 }

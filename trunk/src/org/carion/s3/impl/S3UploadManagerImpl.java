@@ -27,8 +27,6 @@ import org.carion.s3.S3UrlName;
 import org.carion.s3.operations.ObjectPUT;
 
 public class S3UploadManagerImpl implements S3UploadManager {
-    private final int SIZE_LIMIT_ASYNCHRONOUS = 1024 * 1024;
-
     private final S3RepositoryImpl _repository;
 
     private final File _baseDirectory;
@@ -48,24 +46,32 @@ public class S3UploadManagerImpl implements S3UploadManager {
                 _repository.getS3Cache(), this);
 
         length = upload.loadContent(content, length);
-        System.out.println("@@@ upload size:"+length);
+        System.out.println("@@@ upload size:" + length);
 
-        if (length > SIZE_LIMIT_ASYNCHRONOUS) {
+        synchronized (_uploads) {
             _uploads.add(upload);
-            upload.asynchronousUpload(ope, contentType, _repository.getLog());
-        } else {
-            try {
-                if (!ope.execute(upload.getByteBuffer(), contentType)) {
-                    throw new IOException("Can't PUT:" + name.getResourceKey());
-                }
-            } finally {
-                upload.close();
-            }
         }
+        upload.asynchronousUpload(ope, contentType, _repository.getLog());
     }
 
     public List getCurrentUploads() {
         return _uploads;
+    }
+
+    public List getUploadsInDirectory(S3UrlName directory) {
+        List result = new ArrayList();
+        synchronized (_uploads) {
+            for (Iterator iter = _uploads.iterator(); iter.hasNext();) {
+                S3UploadImpl upload = (S3UploadImpl) iter.next();
+                S3UrlName parent = upload.getName().getParent();
+                if (parent != null) {
+                    if (parent.getUri().equals(directory.getUri())) {
+                        result.add(upload.getName());
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     public void shutdown() {

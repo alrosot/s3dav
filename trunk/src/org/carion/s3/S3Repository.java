@@ -19,6 +19,8 @@ import java.io.IOException;
 
 public interface S3Repository {
     boolean isAvailable();
+    
+    S3UploadManager getUploadManager();
 
     S3Log getLog();
 

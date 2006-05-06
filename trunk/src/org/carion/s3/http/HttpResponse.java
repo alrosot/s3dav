@@ -44,6 +44,8 @@ public class HttpResponse {
 
     public final static int SC_INTERNAL_ERROR = 500;
 
+    public final static int SC_NOT_IMPLEMENTED = 501;
+
     /**
      * This map associated the status code and the status message which will be
      * sent in the webdav response
@@ -67,6 +69,7 @@ public class HttpResponse {
         _statusMessages.put(new Integer(SC_UNSUPPORTED_MEDIA_TYPE),
                 "Unsupported Media Type");
         _statusMessages.put(new Integer(SC_CONFLICT), "Conflict");
+        _statusMessages.put(new Integer(SC_NOT_IMPLEMENTED), "Not implemented");
     }
 
     HttpResponse() {

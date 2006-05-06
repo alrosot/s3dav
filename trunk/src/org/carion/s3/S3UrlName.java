@@ -46,4 +46,8 @@ public interface S3UrlName {
     String getResourceKey();
 
     String getPrefixKey();
+    
+    boolean isSameUri(S3UrlName name);
+    
+    boolean equals(Object o);
 }
