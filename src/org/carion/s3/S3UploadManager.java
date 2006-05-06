@@ -27,6 +27,8 @@ public interface S3UploadManager {
     List getCurrentUploads();
 
     void shutdown();
+    
+    List getUploadsInDirectory(S3UrlName name);
 
     /**
      * Describe an upload

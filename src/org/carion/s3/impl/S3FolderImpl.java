@@ -62,7 +62,7 @@ public class S3FolderImpl extends S3ObjectImpl implements S3Folder {
 
             List objects = ope.execute(prefix);
             result = new S3UrlName[objects.size()];
-
+            
             int count = 0;
             for (Iterator iter = objects.iterator(); iter.hasNext();) {
                 Object obj = (Object) iter.next();

@@ -16,6 +16,7 @@
 package org.carion.s3.operations;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import org.carion.s3.Credential;
@@ -49,22 +50,18 @@ public class ObjectPUT extends BaseS3Operation {
     }
 
     public boolean execute() throws IOException {
-        return execute(null, null, null);
+        return execute(null, null, null, -1, null);
     }
 
-    public boolean execute(ByteBuffer content, String contentType)
+    public boolean execute(InputStream content, String contentType,
+            String contentMd5, long contentLength, UploadNotification notify)
             throws IOException {
-        return execute(content, contentType, null);
-    }
-
-    public boolean execute(ByteBuffer content, String contentType,
-            UploadNotification notify) throws IOException {
         S3Request X = S3Request.mkPutRequest(_uri, _log);
         if (content != null) {
             if (notify != null) {
                 X.setUploadNotification(notify);
             }
-            X.setContent(content, contentType);
+            X.setContent(content, contentMd5, contentType, contentLength);
         }
         return process(X);
     }

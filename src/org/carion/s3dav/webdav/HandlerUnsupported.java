@@ -33,6 +33,6 @@ public class HandlerUnsupported extends HandlerBase {
 
     public void process(HttpRequest request, HttpResponse response)
             throws IOException {
-        response.setResponseStatus(HttpResponse.SC_BAD_REQUEST);
+        response.setResponseStatus(HttpResponse.SC_NOT_IMPLEMENTED);
     }
 }

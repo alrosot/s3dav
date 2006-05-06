@@ -1,12 +1,26 @@
 ## Changelog
 ### Release 0.7
-* FIX: fixes in the webDAV protocol implementation to pass the litmus tests
+* NEW: s3DAV is now also a ftp server (default port is 21). 
+
+* NEW: files being uploaded appear in the list of files with a size set to 1. You can see
+  the list of current uploads here: http://127.0.0.1:8060/index.html?page=uploads
+
+* FIX: due to a bug on Memory Mapped file under windows (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4715154)
+  we don't use anymore Memory Mapped file
+  
+* NEW: command line arguments to set the s3 account information
+
+* NEW: new location for authorization file (%user.home%/s3dav/authorization). No need to reauthenticate, the previous
+  authorizationfile will be copied in this new location.
+
+* FIX: fixes in the webDAV protocol implementation to pass the "litmus" tests
   (http://www.webdav.org/neon/litmus/). litmus - WebDAV server protocol compliance test suite
   The only tests which fail (3 on 41) are related to the PROPPATCH command: I've chosen not
   to implement this command, as it's not needed to copy files into a S3 account.
   
-* NEW: you can set the value of the port to be used when launching s3Dav. 
-  java -jar s3DAV-x.y.jar 8060 8070 21
+* NEW: you can set the value of the port to be used when launching s3Dav. For, instance, you can 
+  start s3DAV with java -jar s3DAV-x.y.jar 8060 8070 21. The first port is the admin console, the seconde 
+  one is the webDAV server, the last one is the ftp port.
 
 ### Release 0.6
 

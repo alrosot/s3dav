@@ -345,4 +345,12 @@ public class S3UrlNameImpl implements S3UrlName {
             return false;
         }
     }
+    
+    public boolean isSameUri(S3UrlName name) {
+        if (name == null) {
+            return false;
+        }
+        return getUri().equals(name.getUri());
+    }
+
 }

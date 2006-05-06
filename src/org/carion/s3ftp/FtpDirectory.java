@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.carion.s3.S3Folder;
@@ -30,6 +31,7 @@ import org.carion.s3.S3Repository;
 import org.carion.s3.S3Resource;
 import org.carion.s3.S3UrlName;
 import org.carion.s3.impl.S3UrlNameImpl;
+import org.carion.s3.impl.UploadResource;
 import org.carion.s3.util.MimeTypes;
 
 public class FtpDirectory {
@@ -77,8 +79,18 @@ public class FtpDirectory {
         S3UrlName name = new S3UrlNameImpl(_name, false);
         S3Folder folder = _repository.getFolder(name);
         S3UrlName[] files = folder.getChildrenUris();
+
         List result = new ArrayList();
-        // pass #1: the directories
+
+        List uploads = _repository.getUploadManager().getUploadsInDirectory(
+                folder.getUrl());
+        for (Iterator iter = uploads.iterator(); iter.hasNext();) {
+            S3UrlName uri = (S3UrlName) iter.next();
+            S3Resource res = new UploadResource(uri);
+            result.add(new Child(res.getName(), res.getLastModified(), res
+                    .getLength(), false));
+        }
+
         for (int i = 0; i < files.length; i++) {
             S3UrlName uri = files[i];
             Child child;
@@ -87,10 +99,25 @@ public class FtpDirectory {
                 child = new Child(f.getName(), f.getLastModified(), 0, true);
             } else {
                 S3Resource r = _repository.getResource(uri);
-                child = new Child(r.getName(), r.getLastModified(), r
-                        .getLength(), false);
+                boolean found = false;
+                for (Iterator iter = uploads.iterator(); iter.hasNext();) {
+                    if (uri.isSameUri((S3UrlName) iter.next())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    child = new Child(r.getName(), r.getLastModified(), r
+                            .getLength(), false);
+
+                } else {
+                    child = null;
+                }
+
             }
-            result.add(child);
+            if (child != null) {
+                result.add(child);
+            }
         }
         return result;
     }
