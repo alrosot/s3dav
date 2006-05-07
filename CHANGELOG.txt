@@ -1,4 +1,7 @@
 ## Changelog
+### Release 0.7.1
+* FIX: the S3 keys where not properly updated when entered from the admin console
+
 ### Release 0.7
 * NEW: s3DAV is now also a ftp server (default port is 21). 
 
