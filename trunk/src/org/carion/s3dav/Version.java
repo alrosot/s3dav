@@ -16,7 +16,7 @@
 package org.carion.s3dav;
 
 public class Version {
-    public final static String VERSION = "0.7";
+    public final static String VERSION = "0.7.1";
 
     public final static String USER_AGENT = "s3DAV/" + VERSION;
 }
