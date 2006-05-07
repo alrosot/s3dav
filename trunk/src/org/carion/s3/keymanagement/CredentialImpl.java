@@ -75,15 +75,10 @@ public class CredentialImpl implements Credential {
     public CredentialImpl(File s3davDirectory, String accessKey,
             String secretKey) throws KeyStoreException {
         _accessFile = new File(s3davDirectory, "authorization");
-
         try {
             writeKeyFile(accessKey, secretKey.toCharArray());
             _accessAllowed = true;
-        } catch (UnsupportedEncodingException e) {
-            throw new KeyStoreException("can't set keys:" + e.getMessage());
-        } catch (EncryptionException e) {
-            throw new KeyStoreException("can't set keys:" + e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new KeyStoreException("can't set keys:" + e.getMessage());
         }
     }
@@ -112,12 +107,14 @@ public class CredentialImpl implements Credential {
 
     private void readKeyFile() throws IOException, EncryptionException,
             AwsAuthorizationException {
+        System.out.println("@@ reading cypher from:"+_accessFile);
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(
                 _accessFile));
         int len = in.available();
         byte[] buffer = new byte[len];
         in.read(buffer);
         in.close();
+        System.out.println("@@ len read is:"+len);
 
         String userName = System.getProperty("user.name");
         byte[] cleartext;
@@ -164,7 +161,7 @@ public class CredentialImpl implements Credential {
 
     private void writeKeyFile(String accessKey, char[] secretKey)
             throws UnsupportedEncodingException, EncryptionException,
-            IOException {
+            IOException, AwsAuthorizationException {
         String userName = System.getProperty("user.name");
         byte[] nameRaw = userName.getBytes(UNICODE_FORMAT);
         byte[] accessKeyRaw = accessKey.getBytes(UNICODE_FORMAT);
@@ -198,10 +195,15 @@ public class CredentialImpl implements Credential {
         Encryptor crypt = new ThreeDESEncryptor(userName + KEY_BASE);
         byte[] cipher = crypt.encrypt(cleartext);
 
+        System.out.println("@@ writing cypher in:"+_accessFile);
+        System.out.println("@@ len written is:"+cipher.length);
+
         _accessFile.createNewFile();
         OutputStream out = new FileOutputStream(_accessFile);
         out.write(cipher);
         out.close();
+        
+        readKeyFile();
     }
 
     private static void renameOldAuthFile(File newFile) {
