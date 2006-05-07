@@ -42,8 +42,15 @@ class WelcomePage extends Page {
         _w.out("<li><b>Buckets Page</b>: " + "This page lists the buckets "
                 + "that you have created. "
                 + "This page allows you to create a new bucket</li>");
+        _w.out("<li><b>Uploads Page</b>: "
+                + "This page lists your current uploads</li>");
         _w.out("<li><b>Support Page</b>: " + "Nothing works for you ? "
                 + "you're lost ? this is the page you should read.</li>");
+        _w.out("<li><b>Logs Page</b>: "
+                + "This page gives you access to the logs of s3DAV.</li>");
+        _w.out("<li><b>Browse content</b>: "
+                + "This page allows you to browse the content of " + ""
+                + "your s3 account.</li>");
         _w.out("<li><b>Credits Page</b>: "
                 + "This page gives credit to where credit is due</li>");
         _w.out("</ul></p>");

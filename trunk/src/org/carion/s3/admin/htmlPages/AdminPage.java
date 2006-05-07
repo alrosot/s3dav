@@ -57,9 +57,9 @@ public class AdminPage {
         _pages.add(new UploadsPage("uploads"));
         _pages.add(new SupportPage("support"));
         _pages.add(new LogsPage("logs"));
-        _pages.add(new CreditsPage("credits"));
         _pages.add(new RawListingPage("rawlisting"));
         _pages.add(new DeleteObjectPage("deleteobject"));
+        _pages.add(new CreditsPage("credits"));
     }
 
     public AdminPage(HttpRequest request, S3Repository repository,
