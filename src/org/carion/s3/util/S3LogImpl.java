@@ -20,12 +20,13 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.carion.s3.S3Log;
 
 public class S3LogImpl implements S3Log {
     private static final DateFormat DF = new SimpleDateFormat(
-            "dd/MMM/yyyy:HH:mm:ss Z");
+            "dd/MMM/yyyy:HH:mm:ss Z",Locale.US);
 
     private final LogWriter _writer;
 
