@@ -106,11 +106,11 @@ public class BucketGET extends BaseS3Operation {
 
         /**
          * Response Body
-         * • Name: The name of the bucket.
-         * • Prefix: The prefix you specified in your request, if any.
-         * • Marker: The marker you specified in your request, if any.
-         * • MaxKeys: The max-keys you specified in your request, if any.
-         * • IsTruncated: To aid in pagination, this indicates whether
+         *  Name: The name of the bucket.
+         *  Prefix: The prefix you specified in your request, if any.
+         *  Marker: The marker you specified in your request, if any.
+         *  MaxKeys: The max-keys you specified in your request, if any.
+         *  IsTruncated: To aid in pagination, this indicates whether
          *   where may be more objects in the bucket. If true, then there
          *   may be more objects in the bucket and calling GET again using
          *   the last key received as the marker may return more keys.
@@ -118,13 +118,13 @@ public class BucketGET extends BaseS3Operation {
          *   and you do not need to call GET again.
          *
          * For each object the following information is returned:
-         * • key: The object's key.
-         * • LastModified: The time that the object was placed into S3.
-         * • ETag: The object's entity tag. This is a hash of the object
+         *  key: The object's key.
+         *  LastModified: The time that the object was placed into S3.
+         *  ETag: The object's entity tag. This is a hash of the object
          *   that can be used to do conditional gets.
-         * • Size:The size of the object data in bytes.
-         * • StorageClass: This value will always read STANDARD in this release.
-         * • Owner: This indicates who put the object into Amazon S3.
+         *  Size:The size of the object data in bytes.
+         *  StorageClass: This value will always read STANDARD in this release.
+         *  Owner: This indicates who put the object into Amazon S3.
          *   The owner is provided only if you are the owner, or if you own the bucket.
          */
         protected void processData(String elementName, String fullName,
